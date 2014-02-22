@@ -39,12 +39,12 @@ public class Jinotify {
 
     }
 
-    public void addWatch(String absolutePath, JinotifyListener listener) throws JinotifyException {
+    public void addWatch(String absolutePath, int mask,  JinotifyListener listener) throws JinotifyException {
         watchingFileDescriptor = Libc.INSTANCE.inotify_init();
         if (watchingFileDescriptor < 0) {
             throw new JinotifyException("Couldn't init inotify");
         }
-        inotifyDescriptor = Libc.INSTANCE.inotify_add_watch(watchingFileDescriptor, absolutePath, Libc.IN_MODIFY);
+        inotifyDescriptor = Libc.INSTANCE.inotify_add_watch(watchingFileDescriptor, absolutePath,  mask );
 
     }
 

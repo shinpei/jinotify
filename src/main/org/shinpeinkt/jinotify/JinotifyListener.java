@@ -1,4 +1,7 @@
 package org.shinpeinkt.jinotify;
 
-public class JinotifyListener {
+public abstract class JinotifyListener {
+    public void onCreate () {}
+    public void onModify () {}
+    public void onDelete () {}
 }
