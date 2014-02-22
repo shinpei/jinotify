@@ -18,7 +18,6 @@ public class Jinotify {
             char name;
         }
 
-
         Libc INSTANCE = (Libc) Native.loadLibrary("libc.so.6", Libc.class);
         int inotify_init();
         int inotify_add_watch(int fd, String path, int mask);
