@@ -11,10 +11,11 @@ Please refer the following document.
 
 Example
 ===============
-TBA. 
 
 ```java
 Jinotify jinotify = new Jinotify();
-int fd = jinotify.inotify_init();
-int wd = jinotify.inotify_add_watch(fd, "/tmp", Jinotify.IN_CREATE | Jinotify.IN_DELETE);
+MyListener listner = new MyListener();
+jinotify.addWatch("/tmp", Jinotify.IN_CREATE, listner);
+
+jinotify.closeNotifier();
 ```
