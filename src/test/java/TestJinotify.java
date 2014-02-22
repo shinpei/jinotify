@@ -22,7 +22,7 @@ public class TestJinotify {
     public void testCreateHandler () throws Exception {
         Jinotify jinotify = new Jinotify();
         TestListner listner = new TestListner();
-        jinotify.addWatch("/tmp", listner);
+        jinotify.addWatch("/tmp", 0, listner);
     }
 
 }
