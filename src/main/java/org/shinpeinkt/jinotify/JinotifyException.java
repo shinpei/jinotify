@@ -7,4 +7,7 @@ public class JinotifyException extends Exception {
     JinotifyException(String msg, Throwable e) {
         super(msg, e);
     }
+    JinotifyException(Throwable e) {
+        super(e);
+    }
 }
