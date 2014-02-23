@@ -1,7 +1,7 @@
 package org.shinpeinkt.jinotify;
 
 
-public class JinotifyListener extends Thread {
+public abstract class JinotifyListener extends Thread {
 
     protected int epollDescriptor;
     protected int inotifyDescriptor;
@@ -33,6 +33,9 @@ public class JinotifyListener extends Thread {
         // do nothing
     }
 
+    public void onCreate() {
+        // do nothing
+    }
     public void run () {
         int numEvents = 0;
         try {
@@ -61,7 +64,7 @@ public class JinotifyListener extends Thread {
                             Clib.INSTANCE.perror("error occured while reading fd=" + event.data.fd);
                         }
                         if ((eventBuf.mask & Clib.IN_CREATE) == 0) {
-
+                                this.onCreate();
                         }
 
                     }
