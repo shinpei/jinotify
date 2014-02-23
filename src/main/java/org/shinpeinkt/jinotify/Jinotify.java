@@ -1,8 +1,12 @@
 package org.shinpeinkt.jinotify;
 
-import com.sun.jna.*;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.Structure;
+import com.sun.jna.Union;
 
-import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class Jinotify {
     private int inotifyDescriptor;
@@ -43,21 +47,44 @@ public class Jinotify {
         // epoll bindings
         public static class EpollData extends Union {
             public int fd;
-            public long u64;
+            public long u64; // we don't need, but make size 8.
+            public EpollData() {
+                super();
+            }
+            public EpollData(int fd_or_u32) {
+                super();
+                this.fd = fd_or_u32;
+                setType(Integer.TYPE);
+            }
+            public EpollData(long u64) {
+                super();
+                this.u64 = u64;
+                setType(Long.TYPE);
+            }
+            public static class ByReference extends EpollData implements Structure.ByReference {}
+            public static class ByValue extends EpollData implements Structure.ByValue {}
         }
 
         public static class EpollEvent extends Structure {
             public int events;
             public EpollData data;
-            public static class ByReference extends EpollEvent implements  Structure.ByReference {
 
+            public EpollEvent() {
+                super();
+                setAlignType(Structure.ALIGN_NONE);
             }
+            protected List getFieldOrder() {
+                return Arrays.asList("events", "data");
+            }
+
+            public static class ByReference extends EpollEvent implements  Structure.ByReference { }
+            public static class ByValue extends EpollEvent implements Structure.ByValue { }
         }
 
         int epoll_create(int size);
         int epoll_create1(int flags);
-        int epoll_ctl(int epfd, int op, int fd, Pointer ev);
-        int epoll_wait (int epfd, Pointer ev, int maxEvents, int timeout);
+        int epoll_ctl(int epfd, int op, int fd, EpollEvent.ByReference ev);
+        int epoll_wait (int epfd, EpollEvent[] ev, int maxEvents, int timeout);
 
         final int EPOLLIN = 0x1;
         final int EPOLLPRI = 0x2;
@@ -78,7 +105,7 @@ public class Jinotify {
         final int EPOLL_CTL_MOD = 3;
 
     }
-
+    final int MAX_EVENTS = 1;
     public void addWatch(String absolutePath, int mask,  JinotifyListener listener) throws JinotifyException {
         inotifyDescriptor = Libc.INSTANCE.inotify_init();
         if (inotifyDescriptor < 0) {
@@ -86,41 +113,29 @@ public class Jinotify {
         }
 
         watchingDescriptor = Libc.INSTANCE.inotify_add_watch(inotifyDescriptor, absolutePath,  mask );
-
-        int epollDescriptor = Libc.INSTANCE.epoll_create(1);
+        //watchingDescriptor = Libc.INSTANCE.inotify_add_watch(inotifyDescriptor, "/tmp",  Libc.IN_CREATE );
+        System.err.println("fd=" + inotifyDescriptor + ", wd=" + watchingDescriptor);
+        System.err.println("INCREATE=" + Libc.IN_CREATE + ", EPOLLIN=" + Libc.EPOLLIN);
+        int epollDescriptor = Libc.INSTANCE.epoll_create(MAX_EVENTS);
         if (epollDescriptor < 0) {
             throw new JinotifyException("Couldn't initiate epoll");
         }
-        Libc.EpollEvent eevent = new Libc.EpollEvent();
-        System.err.println(eevent.toString());
-
-        eevent.events = 0;
+        Libc.EpollEvent.ByReference eevent = new Libc.EpollEvent.ByReference();
         eevent.events = Libc.EPOLLIN;
-        eevent.data.fd = inotifyDescriptor;
-        eevent.write();
-        eevent.read();
-        int ret = Libc.INSTANCE.epoll_ctl(
-                epollDescriptor,
-                Libc.EPOLL_CTL_ADD,
-                watchingDescriptor,
-                eevent.getPointer()
-        );
-        eevent.read();
-
+        eevent.data.writeField("fd", inotifyDescriptor);
+        int ret = Libc.INSTANCE.epoll_ctl(epollDescriptor, Libc.EPOLL_CTL_ADD, watchingDescriptor, eevent);
+        Libc.EpollEvent[] ret_events = (Libc.EpollEvent[])(new Libc.EpollEvent()).toArray(MAX_EVENTS);
         if (ret < 0) {
             throw new JinotifyException("epoll_ctl failed");
         }
-        while (true) {
-            System.err.println("Waiting event");
-            eevent.write();
-            int nfd = Libc.INSTANCE.epoll_wait(
-                    epollDescriptor,
-                    eevent.getPointer(),
-                    1,
-                    -1
-            );
-            eevent.read();
-            System.err.println("Catch!");
+        System.err.println("Waiting event");
+        int numEvents = 0;
+        try {
+            while ((numEvents = Libc.INSTANCE.epoll_wait(epollDescriptor, ret_events, MAX_EVENTS, -1)) > 0) {
+                System.err.println("got " + numEvents + " events.");
+            }
+        } finally {
+            //
         }
     }
 

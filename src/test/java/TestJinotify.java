@@ -1,6 +1,8 @@
+import org.junit.Ignore;
 import org.junit.Test;
 import org.shinpeinkt.jinotify.Jinotify;
 import org.shinpeinkt.jinotify.JinotifyListener;
+import org.shinpeinkt.jinotify.JinotifyTest;
 
 import static java.lang.Thread.sleep;
 
@@ -15,20 +17,21 @@ public class TestJinotify {
     }
 
     @Test
-    public void initiation () throws Exception {
-        Jinotify jinotify = new Jinotify();
-
+    public void testFirst() throws Exception {
+        JinotifyTest jt = new JinotifyTest();
+        jt.use();
     }
+
     final String PATH = "/tmp";
 
     @Test
+    //@Ignore
     public void testCreateHandler () throws Exception {
 
         Jinotify jinotify = new Jinotify();
         TestListner listner = new TestListner();
         System.out.println("Watching " + PATH);
         jinotify.addWatch(PATH, Jinotify.Libc.IN_CREATE, listner);
-        sleep(10000);
 
         jinotify.closeNotifier();
     }
