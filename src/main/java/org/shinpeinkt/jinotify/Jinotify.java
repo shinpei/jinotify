@@ -1,20 +1,33 @@
 package org.shinpeinkt.jinotify;
 
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.Structure;
-import com.sun.jna.Union;
+
+import com.sun.jna.*;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class Jinotify {
     private int inotifyDescriptor;
-    private int watchingDescriptor;
+    private int watchingFileDescriptor;
+    private int epollDescriptor;
 
     public interface Libc extends Library {
 
         Libc INSTANCE = (Libc) Native.loadLibrary("libc.so.6", Libc.class);
+
+        // from sys/inotify.h
+        final int PATH_MAX = 16;
+
+        public static class InotifyEvent extends Structure {
+            public int wd;
+            public int mask;
+            public int cookie;
+            public int len;
+            public byte[] name = new byte[PATH_MAX]; // __flexarr, but we limit it to 16
+
+            public static class ByReference extends InotifyEvent implements Structure.ByReference {}
+            public static class ByValue extends InotifyEvent implements Structure.ByValue {}
+        }
 
         int inotify_init();
         int inotify_add_watch(int fd, String path, int mask);
@@ -35,7 +48,7 @@ public class Jinotify {
         final int IN_DELETE_SELF = 0x400;
         final int IN_MOVE_SELF = 0x800;
 
-        // epoll bindings
+        // from sys/epoll.h
         public static class EpollData extends Union {
             public int fd;
             public long u64; // we don't need, but make size 8.
@@ -95,39 +108,116 @@ public class Jinotify {
         final int EPOLL_CTL_DEL = 2;
         final int EPOLL_CTL_MOD = 3;
 
+        int close(int fd);
+        int read (int fd, Pointer buf, int size);
+        void perror(String msg);
+
+        Pointer malloc (int size);
+        void free (Pointer ptr);
     }
+
     final int MAX_EVENTS = 1;
-    public void addWatch(String absolutePath, int mask,  JinotifyListener listener) throws JinotifyException {
-        inotifyDescriptor = Libc.INSTANCE.inotify_init();
-        if (inotifyDescriptor < 0) {
+
+    private int tryInotifyInit () throws JinotifyException {
+        int fd = Libc.INSTANCE.inotify_init();
+        if (fd < 0) {
             throw new JinotifyException("Couldn't initiate inotify");
         }
+        return fd;
+    }
 
-        watchingDescriptor = Libc.INSTANCE.inotify_add_watch(inotifyDescriptor, absolutePath,  mask );
-        int epollDescriptor = Libc.INSTANCE.epoll_create(MAX_EVENTS);
-        if (epollDescriptor < 0) {
-            throw new JinotifyException("Couldn't initiate epoll");
+    private int tryInotifyAddWatch(int fd, String path, int mask) throws JinotifyException {
+        int wd = Libc.INSTANCE.inotify_add_watch(fd, path,  mask);
+        if (wd < 0) {
+            throw new JinotifyException("Couldn't add inotify watch");
         }
+        return wd;
+    }
+
+    private int tryEpollCreate(int size) throws JinotifyException {
+        int epfd = Libc.INSTANCE.epoll_create(size);
+        if (epfd < 0) {
+            throw new JinotifyException("epoll_create failed");
+        }
+        return epfd;
+    }
+
+    private int tryEpollCtl (int epfd, int flag, int fd, Libc.EpollEvent.ByReference ev) throws JinotifyException {
+        int retVal = Libc.INSTANCE.epoll_ctl(epfd, flag, fd, ev);
+        if (retVal < 0) {
+            throw new JinotifyException("epoll_ctl failed");
+        }
+        return retVal; // if success, it's always 0
+    }
+
+    public void addWatch(String absolutePath, int mask,  JinotifyListener listener) throws JinotifyException {
+
+        inotifyDescriptor = tryInotifyInit();
+        watchingFileDescriptor = tryInotifyAddWatch(inotifyDescriptor, absolutePath, mask);
+        epollDescriptor = tryEpollCreate(MAX_EVENTS);
+
         Libc.EpollEvent.ByReference eevent = new Libc.EpollEvent.ByReference();
         eevent.events = Libc.EPOLLIN;
         eevent.data.writeField("fd", inotifyDescriptor);
-        int ret = Libc.INSTANCE.epoll_ctl(epollDescriptor, Libc.EPOLL_CTL_ADD, inotifyDescriptor, eevent);
-        Libc.EpollEvent[] ret_events = (Libc.EpollEvent[])(new Libc.EpollEvent()).toArray(MAX_EVENTS);
-        if (ret < 0) {
-            throw new JinotifyException("epoll_ctl failed");
-        }
-        int numEvents = 0;
-        try {
-            while ((numEvents = Libc.INSTANCE.epoll_wait(epollDescriptor, ret_events, MAX_EVENTS, -1)) > 0) {
-                System.err.println("got " + numEvents + " events.");
-                break;
+
+        tryEpollCtl(epollDescriptor, Libc.EPOLL_CTL_ADD, inotifyDescriptor, eevent);
+
+        // start thread
+        JinotifyWatcher watcher = new JinotifyWatcher();
+        watcher.start();
+    }
+
+    class JinotifyWatcher extends Thread {
+        Libc.EpollEvent[] events = (Libc.EpollEvent[])(new Libc.EpollEvent()).toArray(MAX_EVENTS);
+
+        public void run () {
+            int numEvents = 0;
+            try {
+                while ((numEvents = Libc.INSTANCE.epoll_wait(epollDescriptor, events, MAX_EVENTS, -1)) > 0) {
+                    int i = 0;
+                    for (i = 0; i < numEvents; i++) {
+                        Libc.EpollEvent event = events[i];
+                        if ((
+                                (event.events & Libc.EPOLLERR)
+                                | (event.events & Libc.EPOLLHUP)
+                                | -(event.events & Libc.EPOLLIN)) == 0
+                            )
+                        {
+                            // Must be error
+                            // one of the watching inotify decriptor dies
+                            Libc.INSTANCE.close(event.data.fd);
+                            continue;
+                        }
+                        else if (inotifyDescriptor == event.data.fd) {
+                            // Must be ready for read inotify
+                            Libc.InotifyEvent eventBuf = new Libc.InotifyEvent();
+
+                            int length = Libc.INSTANCE.read(
+                                    event.data.fd, eventBuf.getPointer(), eventBuf.size());
+                            if (length == -1) {
+                                Libc.INSTANCE.perror("error occured while reading fd=" + event.data.fd);
+                            }
+                            if ((eventBuf.mask & Libc.IN_CREATE) == 0) {
+
+                            }
+
+                        }
+                        else {
+                            // Could happened??
+                            System.err.println("get epoll event for fd=" + event.data.fd);
+                        }
+                    }
+                    break;
+                }
+                //} catch (JinotifyException e) {
+
+            } finally {
+                //
             }
-        } finally {
-            //
         }
     }
 
     public void closeNotifier () {
-        Libc.INSTANCE.inotify_rm_watch(inotifyDescriptor, watchingDescriptor);
+        Libc.INSTANCE.inotify_rm_watch(inotifyDescriptor, watchingFileDescriptor);
     }
 }
