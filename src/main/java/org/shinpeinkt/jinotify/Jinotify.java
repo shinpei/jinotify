@@ -35,12 +35,12 @@ public class Jinotify {
         return epfd;
     }
 
-    private int tryEpollCtl (int epfd, int flag, int fd, Clib.EpollEvent.ByReference ev) throws JinotifyException {
+    private void tryEpollCtl (int epfd, int flag, int fd, Clib.EpollEvent.ByReference ev) throws JinotifyException {
         int retVal = Clib.INSTANCE.epoll_ctl(epfd, flag, fd, ev);
         if (retVal < 0) {
             throw new JinotifyException("epoll_ctl failed");
         }
-        return retVal; // if success, it's always 0
+        // retVal is always 0 if success. we don't need to return this.
     }
 
     public <LISTENER extends JinotifyListener>
@@ -77,11 +77,6 @@ public class Jinotify {
         } catch (InvocationTargetException e) {
             throw new JinotifyException(e);
         }
-
-    }
-
-    class JinotifyWatcher extends Thread {
-
 
     }
 

@@ -13,7 +13,7 @@ public abstract class JinotifyListener extends Thread {
         return ret;
     }
 
-    public JinotifyListener (int epollDescriptor, int inotifyDescriptor, int maxEvents) {
+    protected JinotifyListener (int epollDescriptor, int inotifyDescriptor, int maxEvents) {
         this.epollDescriptor = epollDescriptor;
         this.inotifyDescriptor = inotifyDescriptor;
         this.events = (Clib.EpollEvent[])(new Clib.EpollEvent()).toArray(maxEvents);

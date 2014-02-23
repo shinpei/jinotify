@@ -71,6 +71,7 @@ public interface Clib extends Library {
             super();
             setAlignType(Structure.ALIGN_NONE);
         }
+
         protected List getFieldOrder() {
             return Arrays.asList("events", "data");
         }
