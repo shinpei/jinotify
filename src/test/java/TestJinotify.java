@@ -15,24 +15,14 @@ public class TestJinotify {
             System.out.println("hey, you created something, huh?");
         }
     }
-
-    @Test
-    public void testFirst() throws Exception {
-        JinotifyTest jt = new JinotifyTest();
-        jt.use();
-    }
-
     final String PATH = "/tmp";
 
     @Test
-    //@Ignore
     public void testCreateHandler () throws Exception {
-
         Jinotify jinotify = new Jinotify();
         TestListner listner = new TestListner();
         System.out.println("Watching " + PATH);
         jinotify.addWatch(PATH, Jinotify.Libc.IN_CREATE, listner);
-
         jinotify.closeNotifier();
     }
 

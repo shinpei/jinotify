@@ -14,15 +14,6 @@ public class Jinotify {
 
     public interface Libc extends Library {
 
-        // inotify bindings
-        public static class INotifyEvent extends Structure {
-            int watchFileDescriptor;
-            int mask;
-            int cookie;
-            int length;
-            char name;
-        }
-
         Libc INSTANCE = (Libc) Native.loadLibrary("libc.so.6", Libc.class);
 
         int inotify_init();
@@ -113,9 +104,6 @@ public class Jinotify {
         }
 
         watchingDescriptor = Libc.INSTANCE.inotify_add_watch(inotifyDescriptor, absolutePath,  mask );
-        //watchingDescriptor = Libc.INSTANCE.inotify_add_watch(inotifyDescriptor, "/tmp",  Libc.IN_CREATE );
-        System.err.println("fd=" + inotifyDescriptor + ", wd=" + watchingDescriptor);
-        System.err.println("INCREATE=" + Libc.IN_CREATE + ", EPOLLIN=" + Libc.EPOLLIN);
         int epollDescriptor = Libc.INSTANCE.epoll_create(MAX_EVENTS);
         if (epollDescriptor < 0) {
             throw new JinotifyException("Couldn't initiate epoll");
@@ -123,16 +111,16 @@ public class Jinotify {
         Libc.EpollEvent.ByReference eevent = new Libc.EpollEvent.ByReference();
         eevent.events = Libc.EPOLLIN;
         eevent.data.writeField("fd", inotifyDescriptor);
-        int ret = Libc.INSTANCE.epoll_ctl(epollDescriptor, Libc.EPOLL_CTL_ADD, watchingDescriptor, eevent);
+        int ret = Libc.INSTANCE.epoll_ctl(epollDescriptor, Libc.EPOLL_CTL_ADD, inotifyDescriptor, eevent);
         Libc.EpollEvent[] ret_events = (Libc.EpollEvent[])(new Libc.EpollEvent()).toArray(MAX_EVENTS);
         if (ret < 0) {
             throw new JinotifyException("epoll_ctl failed");
         }
-        System.err.println("Waiting event");
         int numEvents = 0;
         try {
             while ((numEvents = Libc.INSTANCE.epoll_wait(epollDescriptor, ret_events, MAX_EVENTS, -1)) > 0) {
                 System.err.println("got " + numEvents + " events.");
+                break;
             }
         } finally {
             //
