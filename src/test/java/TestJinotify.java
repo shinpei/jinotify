@@ -1,10 +1,9 @@
+import com.google.common.io.Files;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.shinpeinkt.jinotify.Jinotify;
 import org.shinpeinkt.jinotify.JinotifyListener;
-import org.shinpeinkt.jinotify.JinotifyTest;
 
-import static java.lang.Thread.sleep;
 
 public class TestJinotify {
 
@@ -23,6 +22,9 @@ public class TestJinotify {
         TestListner listner = new TestListner();
         System.out.println("Watching " + PATH);
         jinotify.addWatch(PATH, Jinotify.Libc.IN_CREATE, listner);
+
+        Files.createTempDir();
+
         jinotify.closeNotifier();
     }
 
