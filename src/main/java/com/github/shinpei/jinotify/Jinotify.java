@@ -1,4 +1,4 @@
-package org.shinpeinkt.jinotify;
+package com.github.shinpei.jinotify;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

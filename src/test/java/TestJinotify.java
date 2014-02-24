@@ -1,7 +1,7 @@
 import com.google.common.io.Files;
 import org.junit.Test;
-import org.shinpeinkt.jinotify.Clib;
-import org.shinpeinkt.jinotify.Jinotify;
+import com.github.shinpei.jinotify.Clib;
+import com.github.shinpei.jinotify.Jinotify;
 
 public class TestJinotify {
 

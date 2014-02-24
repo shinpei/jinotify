@@ -1,4 +1,4 @@
-package org.shinpeinkt.jinotify;
+package com.github.shinpei.jinotify;
 
 
 public abstract class JinotifyListener extends Thread {

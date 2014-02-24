@@ -1,4 +1,4 @@
-import org.shinpeinkt.jinotify.JinotifyListener;
+import com.github.shinpei.jinotify.JinotifyListener;
 
 public class MyTestListner extends JinotifyListener {
 
