@@ -12,7 +12,7 @@ public class Jinotify {
     final int MAX_EVENTS = 1;
 
     private int tryInotifyInit () throws JinotifyException {
-        int fd = Clib.INSTANCE.inotify_init();
+        int fd = Clib.inotify_init();
         if (fd < 0) {
             throw new JinotifyException("Couldn't initiate inotify");
         }
@@ -20,7 +20,7 @@ public class Jinotify {
     }
 
     private int tryInotifyAddWatch(int fd, String path, int mask) throws JinotifyException {
-        int wd = Clib.INSTANCE.inotify_add_watch(fd, path,  mask);
+        int wd = Clib.inotify_add_watch(fd, path,  mask);
         if (wd < 0) {
             throw new JinotifyException("Couldn't add inotify watch");
         }
@@ -28,7 +28,7 @@ public class Jinotify {
     }
 
     private int tryEpollCreate(int size) throws JinotifyException {
-        int epfd = Clib.INSTANCE.epoll_create(size);
+        int epfd = Clib.epoll_create(size);
         if (epfd < 0) {
             throw new JinotifyException("epoll_create failed");
         }
@@ -36,7 +36,7 @@ public class Jinotify {
     }
 
     private void tryEpollCtl (int epfd, int flag, int fd, Clib.EpollEvent.ByReference ev) throws JinotifyException {
-        int retVal = Clib.INSTANCE.epoll_ctl(epfd, flag, fd, ev);
+        int retVal = Clib.epoll_ctl(epfd, flag, fd, ev);
         if (retVal < 0) {
             throw new JinotifyException("epoll_ctl failed");
         }
@@ -81,6 +81,6 @@ public class Jinotify {
     }
 
     public void closeNotifier () {
-        Clib.INSTANCE.inotify_rm_watch(inotifyDescriptor, watchingFileDescriptor);
+        Clib.inotify_rm_watch(inotifyDescriptor, watchingFileDescriptor);
     }
 }

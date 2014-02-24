@@ -39,7 +39,7 @@ public abstract class JinotifyListener extends Thread {
     public void run () {
         int numEvents = 0;
         try {
-            while ((numEvents = Clib.INSTANCE.epoll_wait(epollDescriptor, events, maxEvents, -1)) > 0) {
+            while ((numEvents = Clib.epoll_wait(epollDescriptor, events, maxEvents, -1)) > 0) {
                 int i = 0;
                 for (i = 0; i < numEvents; i++) {
                     Clib.EpollEvent event = events[i];
@@ -51,17 +51,17 @@ public abstract class JinotifyListener extends Thread {
                     {
                         // Must be error
                         // one of the watching inotify decriptor dies
-                        Clib.INSTANCE.close(event.data.fd);
+                        Clib.close(event.data.fd);
                         continue;
                     }
                     else if (inotifyDescriptor == event.data.fd) {
                         // Must be ready for read inotify
                         Clib.InotifyEvent eventBuf = new Clib.InotifyEvent();
 
-                        int length = Clib.INSTANCE.read(
+                        int length = Clib.read(
                                 event.data.fd, eventBuf.getPointer(), eventBuf.size());
                         if (length == -1) {
-                            Clib.INSTANCE.perror("error occured while reading fd=" + event.data.fd);
+                            Clib.perror("error occured while reading fd=" + event.data.fd);
                         }
                         if ((eventBuf.mask & Clib.IN_CREATE) == 0) {
                                 this.onCreate();
