@@ -33,9 +33,10 @@ public class Jinotify {
         } catch (NoSuchMethodException e) {
             throw new JinotifyException("cannot get constructor" + e.getMessage(), e);
         }
-        Object[] args = {epollDescriptor, inotifyDescriptor, MAX_EVENTS};
+
         try {
-            LISTENER listener = constructor.newInstance(args);
+            LISTENER listener = constructor.newInstance();
+            listener.initialize(epollDescriptor, inotifyDescriptor, MAX_EVENTS);
             listener.start();
         } catch (IllegalArgumentException e) {
             throw new JinotifyException(e);

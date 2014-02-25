@@ -9,15 +9,12 @@ public abstract class JinotifyListener extends Thread {
     private Clib.EpollEvent[] events;
 
     public static Class<?>[] getArgumentTypes() {
-        Class<?>[] ret = {int.class, int.class, int.class};
+        Class<?>[] ret = {};
         return ret;
     }
 
-    protected JinotifyListener (int epollDescriptor, int inotifyDescriptor, int maxEvents) {
-        this.epollDescriptor = epollDescriptor;
-        this.inotifyDescriptor = inotifyDescriptor;
-        this.events = (Clib.EpollEvent[])(new Clib.EpollEvent()).toArray(maxEvents);
-        this.maxEvents = maxEvents;
+    protected JinotifyListener () {
+        // do nothing.
     }
 
 
@@ -80,6 +77,13 @@ public abstract class JinotifyListener extends Thread {
         } finally {
             //
         }
+    }
+
+    public void initialize (int epollDescriptor, int inotifyDescriptor, int maxEvents){
+        this.epollDescriptor = epollDescriptor;
+        this.inotifyDescriptor = inotifyDescriptor;
+        this.maxEvents = maxEvents;
+        this.events = (Clib.EpollEvent[])(new Clib.EpollEvent()).toArray(maxEvents);
     }
 
 }
