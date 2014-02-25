@@ -9,16 +9,12 @@ Document is not ready yet.
 
 Example
 ===============
-First, define your watcher. Constructor will be removed, but we need to define this for now.
+First, define your listner.
+
 ```java
 import org.shinpeinkt.jinotify.JinotifyListener;
 
 public class MyTestListner extends JinotifyListener {
-
-    public MyTestListner (int epollDescriptor, int inotifyDescriptor, int maxEvents) {
-        super(epollDescriptor, inotifyDescriptor, maxEvents);
-    }
-
     public void onCreate () {
         System.out.println("hey, you created something, huh?");
     }
@@ -34,4 +30,4 @@ Files.createTempDir();
 jinotify.closeNotifier();
 ```
 
-cheers.
+cheers, :beers:
