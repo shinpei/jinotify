@@ -9,7 +9,6 @@ public class TestJinotify {
     final String PATH = "/tmp";
 
     @Test
-    @Ignore
     public void basicEventHandling () throws Exception {
         Jinotify jinotify = new Jinotify();
 

@@ -101,9 +101,8 @@ public class Clib {
     public static native int epoll_create(int size);
     public static native int epoll_create1(int flags);
     public static native int epoll_ctl(int epfd, int op, int fd, EpollEvent.ByReference ev);
-    public static native int epoll_wait (int epfd, EpollEvent[] ev, int maxEvents, int timeout);
+    public static native int epoll_wait (int epfd, Pointer /*EpollEvent[] */ ev, int maxEvents, int timeout);
 
-    /*
     public static final int EPOLLIN = 0x1;
     public static final int EPOLLPRI = 0x2;
     public static final int EPOLLOUT = 0x4;
@@ -128,6 +127,6 @@ public class Clib {
 
     public static native Pointer malloc (int size);
     public static native void free (Pointer ptr);
-    */
+
 }
 
