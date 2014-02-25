@@ -40,9 +40,9 @@ public class Clib {
         public static class ByValue extends InotifyEvent implements Structure.ByValue {}
     }
 
-    public static native int inotify_init();
-    public static native int inotify_add_watch(int fd, String path, int mask);
-    public static native int inotify_rm_watch(int fd, int wd);
+    private static native int inotify_init();
+    private static native int inotify_add_watch(int fd, String path, int mask);
+    private static native int inotify_rm_watch(int fd, int wd);
 
 
     public static final int IN_ACCESS = 0x1;
@@ -59,6 +59,31 @@ public class Clib {
     public static final int IN_DELETE = 0x200;
     public static final int IN_DELETE_SELF = 0x400;
     public static final int IN_MOVE_SELF = 0x800;
+
+
+    public static int tryInotifyInit () throws ClibException {
+        int fd = inotify_init();
+        if (fd < 0) {
+            throw new ClibException("Couldn't initiate inotify");
+        }
+        return fd;
+    }
+
+    public static int tryInotifyAddWatch(int fd, String path, int mask) throws ClibException {
+        int wd = inotify_add_watch(fd, path,  mask);
+        if (wd < 0) {
+            throw new ClibException("Couldn't add inotify watch");
+        }
+        return wd;
+    }
+
+    public static int tryInotifyReWatch(int fd, int wd) throws ClibException {
+        int retVal = inotify_rm_watch(fd, wd);
+        if (retVal < 0) {
+            throw new ClibException("Couldn't remove inotify watch for fd=" + fd + ", wd=" + wd);
+        }
+        return retVal;
+    }
 
     // from sys/epoll.h
     public static class EpollData extends Union {
@@ -98,9 +123,9 @@ public class Clib {
         public static class ByValue extends EpollEvent implements Structure.ByValue { }
     }
 
-    public static native int epoll_create(int size);
-    public static native int epoll_create1(int flags);
-    public static native int epoll_ctl(int epfd, int op, int fd, EpollEvent.ByReference ev);
+    private static native int epoll_create(int size);
+    private static native int epoll_create1(int flags);
+    private static native int epoll_ctl(int epfd, int op, int fd, EpollEvent.ByReference ev);
     public static native int epoll_wait (int epfd, Pointer /*EpollEvent[] */ ev, int maxEvents, int timeout);
 
     public static final int EPOLLIN = 0x1;
@@ -121,12 +146,36 @@ public class Clib {
     public static final int EPOLL_CTL_DEL = 2;
     public static final int EPOLL_CTL_MOD = 3;
 
+
+
+    public static int tryEpollCreate(int size) throws ClibException {
+        int epfd = epoll_create(size);
+        if (epfd < 0) {
+            throw new ClibException("epoll_create failed");
+        }
+        return epfd;
+    }
+
+    public static void tryEpollCtl (int epfd, int flag, int fd, Clib.EpollEvent.ByReference ev) throws ClibException {
+        int retVal = epoll_ctl(epfd, flag, fd, ev);
+        if (retVal < 0) {
+            throw new ClibException("epoll_ctl failed");
+        }
+        // retVal is always 0 if success. we don't need to return this.
+    }
+
+    public static int tryEpollWait(int epfd, Pointer ev, int maxEvents, int timeout) throws ClibException{
+        int retVal = epoll_wait(epfd, ev, maxEvents, timeout);
+        if (retVal < 0) {
+            throw new ClibException("epoll_wait is fail");
+        }
+        return retVal;
+    }
+
+
     public static native int close(int fd);
     public static native int read (int fd, Pointer buf, int size);
     public static native void perror(String msg);
-
-    public static native Pointer malloc (int size);
-    public static native void free (Pointer ptr);
 
 }
 
