@@ -15,36 +15,36 @@ public class TestClib {
     @Test
     public void inotifyAddWatch () throws Exception {
         int fd = Clib.tryInotifyInit();
-        int wd = Clib.tryInotifyAddWatch(fd, tempPath, Clib.IN_CREATE);
+        int wd = Clib.tryInotifyAddWatch(fd, tempPath, Clib.InotifyConstants.CREATE.value());
         Clib.tryInotifyReWatch(fd, wd);
     }
 
     @Test
     public void epollCreate() throws Exception {
-        int fd = Clib.tryEpollCreate(1);
+        int fd = Clib.tryEpollCreate();
     }
 
 
     @Test
     public void epollCtl () throws Exception {
-        int epfd = Clib.tryEpollCreate(1);
+        int epfd = Clib.tryEpollCreate();
         Clib.EpollEvent.ByReference eevent = new Clib.EpollEvent.ByReference();
-        Clib.tryEpollCtl(epfd, Clib.EPOLL_CTL_ADD, 0, eevent);
-        eevent.events = Clib.EPOLLIN;
+        Clib.tryEpollCtl(epfd, Clib.EpollConstants.CTL_ADD.value(), 0, eevent);
+        eevent.events = Clib.EpollConstants.IN.value();
         eevent.data.writeField("fd", 0);
     }
 
     @Test
     public void inotifyAndEpoll() throws Exception {
         int fd = Clib.tryInotifyInit();
-        int wd = Clib.tryInotifyAddWatch(fd, tempPath, Clib.IN_CREATE);
-        int epfd = Clib.tryEpollCreate(1);
+        int wd = Clib.tryInotifyAddWatch(fd, tempPath, Clib.InotifyConstants.CREATE.value());
+        int epfd = Clib.tryEpollCreate();
         Clib.EpollEvent.ByReference eevent = new Clib.EpollEvent.ByReference();
-        eevent.events = Clib.EPOLLIN;
+        eevent.events = Clib.EpollConstants.IN.value();
         eevent.data.writeField("fd", fd);
-        Clib.tryEpollCtl(epfd, Clib.EPOLL_CTL_ADD, fd, eevent);
+        Clib.tryEpollCtl(epfd, Clib.EpollConstants.CTL_ADD.value(), fd, eevent);
         Clib.EpollEvent[] events = (Clib.EpollEvent[])(new Clib.EpollEvent()).toArray(1);
-        // cannot wath because it's blocking.
+        assertNotNull(events);
     }
 
 }

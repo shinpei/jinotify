@@ -40,20 +40,19 @@ public class Clib {
         public static class ByValue extends InotifyEvent implements Structure.ByValue {}
     }
 
-    public static final int IN_ACCESS = 0x1;
-    public static final int IN_MODIFY = 0x2;
-    public static final int IN_ATTRIB = 0x4;
-    public static final int IN_CLOSE_WRITE = 0x8;
-    public static final int IN_CLOSE_NOWRITE = 0x10;
-    public static final int IN_OPEN = 0x20;
-    public static final int IN_CLOSE = (IN_CLOSE_WRITE | IN_CLOSE_NOWRITE);
-    public static final int IN_MOVED_FROM = 0x40;
-    public static final int IN_MOVED_TO = 0x80;
-    public static final int IN_MOVE = (IN_MOVED_FROM | IN_MOVED_TO);
-    public static final int IN_CREATE = 0x100;
-    public static final int IN_DELETE = 0x200;
-    public static final int IN_DELETE_SELF = 0x400;
-    public static final int IN_MOVE_SELF = 0x800;
+    public enum InotifyConstants {
+        ACCESS(0x1), MODIFY(0x2), ATTRIB(0x4), CLOSE_WRITE(0x8),
+        CLOSE_NOWRITE(0x10), OPEN(0x20), CLOSE(CLOSE_WRITE.value() | CLOSE_NOWRITE.value()), MOVED_FROM(0x40),
+        MOVED_TO(0x80), MOVE(MOVED_FROM.value() | MOVED_TO.value()), CREATE(0x100), DELETE(0x200),
+        DELETE_SELF(0x400), MOVE_SELF(0x800);
+
+        private final int value;
+
+        InotifyConstants (final int value) {
+            this.value = value;
+        }
+        public final int value() { return value;}
+    }
 
     private static native int inotify_init();
     private static native int inotify_add_watch(int fd, String path, int mask);
@@ -121,31 +120,28 @@ public class Clib {
         public static class ByValue extends EpollEvent implements Structure.ByValue { }
     }
 
-    public static final int EPOLLIN = 0x1;
-    public static final int EPOLLPRI = 0x2;
-    public static final int EPOLLOUT = 0x4;
-    public static final int EPOLLRDNORM = 0x40;
-    public static final int EPOLLRDBAND = 0x80;
-    public static final int EPOLLWRNORM = 0x100;
-    public static final int EPOLLWRBAND = 0x200;
-    public static final int EPOLLMSG = 0x400;
-    public static final int EPOLLERR = 0x8;
-    public static final int EPOLLHUP = 0x10;
-    public static final int EPOLLRDHUP = 0x2000;
-    public static final int EPOLLONESHOT = (1 << 30);
-    public static final int EPOLLLET = (1 << 31);
+    public enum EpollConstants {
+        IN(0x1), PRI(0x2), OUT(0x4), RDNORM(0x40),
+        RDBAND(0x80), WRNORM(0x100), WRBAND(0x200), MSG(0x400),
+        ERR(0x8), HUP(0x10), RDHUP(0x2000), ONESHOT(1 << 30),
+        LET(1 << 31), CTL_ADD(1), CTL_DEL(2), CTL_MOD(3);
 
-    public static final int  EPOLL_CTL_ADD = 1;
-    public static final int EPOLL_CTL_DEL = 2;
-    public static final int EPOLL_CTL_MOD = 3;
+        private final int value;
+        EpollConstants (final int value) {
+            this.value = value;
+        }
+
+        public final int value() { return value; }
+
+    }
 
     private static native int epoll_create(int size);
     private static native int epoll_create1(int flags);
     private static native int epoll_ctl(int epfd, int op, int fd, EpollEvent.ByReference ev);
     public static native int epoll_wait (int epfd, Pointer /*EpollEvent[] */ ev, int maxEvents, int timeout);
 
-    public static int tryEpollCreate(int size) throws ClibException {
-        int epfd = epoll_create(size);
+    public static int tryEpollCreate() throws ClibException {
+        int epfd = epoll_create(1); // epoll_create won't need argument on present Linux. (But we need to use it, sigh)
         if (epfd < 0) {
             throw new ClibException("epoll_create failed");
         }

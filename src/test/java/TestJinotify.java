@@ -12,7 +12,7 @@ public class TestJinotify {
     public void basicEventHandling () throws Exception {
         Jinotify jinotify = new Jinotify();
 
-        jinotify.addWatch(PATH, Clib.IN_CREATE, MyTestListner.class);
+        jinotify.addWatch(PATH, Jinotify.CREATE, MyTestListner.class);
 
         Files.createTempDir();
 

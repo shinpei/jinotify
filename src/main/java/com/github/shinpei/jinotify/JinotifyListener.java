@@ -41,9 +41,9 @@ public abstract class JinotifyListener extends Thread {
                 for (i = 0; i < numEvents; i++) {
                     Clib.EpollEvent event = events[i];
                     if ((
-                            (event.events & Clib.EPOLLERR)
-                                    | (event.events & Clib.EPOLLHUP)
-                                    | -(event.events & Clib.EPOLLIN)) == 0
+                            (event.events & Clib.EpollConstants.ERR.value())
+                                    | (event.events & Clib.EpollConstants.HUP.value())
+                                    | -(event.events & Clib.EpollConstants.IN.value())) == 0
                             )
                     {
                         // Must be error
@@ -60,7 +60,7 @@ public abstract class JinotifyListener extends Thread {
                         if (length == -1) {
                             Clib.perror("error occured while reading fd=" + event.data.fd);
                         }
-                        if ((eventBuf.mask & Clib.IN_CREATE) == 0) {
+                        if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) == 0) {
                                 this.onCreate();
                         }
 
@@ -81,6 +81,8 @@ public abstract class JinotifyListener extends Thread {
     }
 
     public void initialize (int epollDescriptor, int inotifyDescriptor, int maxEvents){
+
+        // int cannot be under 0;
         this.epollDescriptor = epollDescriptor;
         this.inotifyDescriptor = inotifyDescriptor;
         this.maxEvents = maxEvents;

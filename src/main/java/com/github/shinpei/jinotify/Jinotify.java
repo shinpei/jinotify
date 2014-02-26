@@ -8,23 +8,37 @@ public class Jinotify {
     private int watchingFileDescriptor;
     private int epollDescriptor;
 
-
     final int MAX_EVENTS = 1;
 
+    public enum JinotifyEvents {
+        CREATE(Clib.InotifyConstants.CREATE);
+
+        private Clib.InotifyConstants value;
+        JinotifyEvents(Clib.InotifyConstants value) {
+            this.value = value;
+        }
+        public int ivalue() {
+            return value.value();
+        }
+
+        // TODO: need to define bit operators '|'
+    }
+
+    public static final JinotifyEvents CREATE = JinotifyEvents.CREATE;
 
     public <LISTENER extends JinotifyListener>
-    void addWatch(String absolutePath, int mask, Class<LISTENER> klass)
+    void addWatch(String absolutePath, JinotifyEvents mask, Class<LISTENER> klass)
             throws ClibException, JinotifyException {
 
         inotifyDescriptor = Clib.tryInotifyInit();
-        watchingFileDescriptor = Clib.tryInotifyAddWatch(inotifyDescriptor, absolutePath, mask);
-        epollDescriptor = Clib.tryEpollCreate(MAX_EVENTS);
+        watchingFileDescriptor = Clib.tryInotifyAddWatch(inotifyDescriptor, absolutePath, mask.ivalue());
+        epollDescriptor = Clib.tryEpollCreate();
 
         Clib.EpollEvent.ByReference eevent = new Clib.EpollEvent.ByReference();
-        eevent.events = Clib.EPOLLIN;
+        eevent.events = Clib.EpollConstants.IN.value();
         eevent.data.writeField("fd", inotifyDescriptor);
 
-        Clib.tryEpollCtl(epollDescriptor, Clib.EPOLL_CTL_ADD, inotifyDescriptor, eevent);
+        Clib.tryEpollCtl(epollDescriptor, Clib.EpollConstants.CTL_ADD.value(), inotifyDescriptor, eevent);
 
         // start thread
         Constructor<LISTENER> constructor = null;
