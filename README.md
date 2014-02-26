@@ -20,7 +20,7 @@ And, call.
 
 ```java
 Jinotify jinotify = new Jinotify();
-jinotify.addWatch("/tmp", Clib.IN_CREATE, MyTestListner.class);
+jinotify.addWatch("/tmp", Jinotify.CREATE, MyTestListner.class);
 Files.createTempDir();
 jinotify.closeNotifier();
 ```

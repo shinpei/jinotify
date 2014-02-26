@@ -110,7 +110,6 @@ public class Clib {
 
         public EpollEvent() {
             super(Structure.ALIGN_NONE);
-            //setAlignType(Structure.ALIGN_NONE);
         }
 
         protected List getFieldOrder() {
@@ -139,7 +138,7 @@ public class Clib {
     private static native int epoll_create(int size);
     private static native int epoll_create1(int flags);
     private static native int epoll_ctl(int epfd, int op, int fd, EpollEvent.ByReference ev);
-    public static native int epoll_wait (int epfd, Pointer /*EpollEvent[] */ ev, int maxEvents, int timeout);
+    private static native int epoll_wait (int epfd, Pointer /*EpollEvent[] */ ev, int maxEvents, int timeout);
 
     public static int tryEpollCreate() throws ClibException {
         int epfd = epoll_create(1); // epoll_create won't need argument on present Linux. (But we need to use it, sigh)
