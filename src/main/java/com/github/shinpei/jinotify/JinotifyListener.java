@@ -36,7 +36,7 @@ public abstract class JinotifyListener extends Thread {
     public void run () {
         int numEvents = 0;
         try {
-            while ((numEvents = Clib.epoll_wait(epollDescriptor, events[0].getPointer(), maxEvents, -1)) > 0) {
+            while ((numEvents = Clib.tryEpollWait(epollDescriptor, events[0].getPointer(), maxEvents, -1)) > 0) {
                 int i = 0;
                 for (i = 0; i < numEvents; i++) {
                     Clib.EpollEvent event = events[i];
@@ -72,7 +72,8 @@ public abstract class JinotifyListener extends Thread {
                 }
                 break;
             }
-            //} catch (JinotifyException e) {
+        } catch (ClibException e) {
+            // die
 
         } finally {
             //

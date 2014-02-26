@@ -6,22 +6,24 @@ import static org.junit.Assert.*;
 
 
 public class TestClib {
-    @Test
-    public void inotifyEvent() throws Exception {
-
-    }
-
+    static final String tempPath = "/tmp";
     @Test
     public void inotifyInit () throws Exception {
         int fd = Clib.tryInotifyInit();
-        assertNotSame(-1, fd);
+    }
+
+    @Test
+    public void inotifyAddWatch () throws Exception {
+        int fd = Clib.tryInotifyInit();
+        int wd = Clib.tryInotifyAddWatch(fd, tempPath, Clib.IN_CREATE);
+        Clib.tryInotifyReWatch(fd, wd);
     }
 
     @Test
     public void epollCreate() throws Exception {
         int fd = Clib.tryEpollCreate(1);
-
     }
+
 
     @Test
     public void epollCtl () throws Exception {
@@ -35,7 +37,7 @@ public class TestClib {
     @Test
     public void inotifyAndEpoll() throws Exception {
         int fd = Clib.tryInotifyInit();
-        int wd = Clib.tryInotifyAddWatch(fd, "/tmp", Clib.IN_CREATE);
+        int wd = Clib.tryInotifyAddWatch(fd, tempPath, Clib.IN_CREATE);
         int epfd = Clib.tryEpollCreate(1);
         Clib.EpollEvent.ByReference eevent = new Clib.EpollEvent.ByReference();
         eevent.events = Clib.EPOLLIN;
