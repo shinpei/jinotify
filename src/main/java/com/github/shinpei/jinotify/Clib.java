@@ -66,6 +66,7 @@ public class Clib {
         return fd;
     }
 
+    //TODO: made mask type checkable
     public static int tryInotifyAddWatch(int fd, String path, int mask) throws ClibException {
         int wd = inotify_add_watch(fd, path,  mask);
         if (wd < 0) {

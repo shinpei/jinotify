@@ -10,14 +10,19 @@ public class Jinotify {
 
     final int MAX_EVENTS = 1;
 
-    public enum JinotifyEvents {
-        CREATE(Clib.InotifyConstants.CREATE);
+    private enum JinotifyEvents {
+        CREATE(Clib.InotifyConstants.CREATE),
+        ACCESS(Clib.InotifyConstants.ACCESS),
+        CLOSE(Clib.InotifyConstants.CLOSE),
+        MODIFY(Clib.InotifyConstants.MODIFY);
 
-        private Clib.InotifyConstants value;
-        JinotifyEvents(Clib.InotifyConstants value) {
+        private final Clib.InotifyConstants value;
+
+        JinotifyEvents(final Clib.InotifyConstants value) {
             this.value = value;
         }
-        public int ivalue() {
+
+        public final int ivalue() {
             return value.value();
         }
 
@@ -25,6 +30,9 @@ public class Jinotify {
     }
 
     public static final JinotifyEvents CREATE = JinotifyEvents.CREATE;
+    public static final JinotifyEvents CLOSE = JinotifyEvents.CLOSE;
+    public static final JinotifyEvents ACCESS = JinotifyEvents.ACCESS;
+    public static final JinotifyEvents MODIFY = JinotifyEvents.MODIFY;
 
     public <LISTENER extends JinotifyListener>
     void addWatch(String absolutePath, JinotifyEvents mask, Class<LISTENER> klass)
