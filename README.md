@@ -31,7 +31,7 @@ Install (Maven)
 <dependency>
     <groupId>com.github.shinpei</groupId>
     <artifactId>jinotify</artifactId>
-    <version>4.0.0</version>
+    <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
