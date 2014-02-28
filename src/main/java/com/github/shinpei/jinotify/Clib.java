@@ -1,5 +1,6 @@
 package com.github.shinpei.jinotify;
 
+import com.google.common.base.Preconditions;
 import com.sun.jna.*;
 
 import java.util.Arrays;
@@ -58,28 +59,22 @@ public class Clib {
     private static native int inotify_add_watch(int fd, String path, int mask);
     private static native int inotify_rm_watch(int fd, int wd);
 
-    public static int tryInotifyInit () throws ClibException {
+    public static int tryInotifyInit () {
         int fd = inotify_init();
-        if (fd < 0) {
-            throw new ClibException("Couldn't initiate inotify");
-        }
+        Preconditions.checkState(fd >= 0, "Couldn't initiate inotify");
         return fd;
     }
 
     //TODO: made mask type checkable
-    public static int tryInotifyAddWatch(int fd, String path, int mask) throws ClibException {
+    public static int tryInotifyAddWatch(int fd, String path, int mask) {
         int wd = inotify_add_watch(fd, path,  mask);
-        if (wd < 0) {
-            throw new ClibException("Couldn't add inotify watch");
-        }
+        Preconditions.checkState(wd >= 0, "Couldn't add inotify watch");
         return wd;
     }
 
-    public static void tryInotifyReWatch(int fd, int wd) throws ClibException {
+    public static void tryInotifyReWatch(int fd, int wd) {
         int retVal = inotify_rm_watch(fd, wd);
-        if (retVal < 0) {
-            throw new ClibException("Couldn't remove inotify watch for fd=" + fd + ", wd=" + wd);
-        }
+        Preconditions.checkState(retVal >= 0, "Couldn't remove inotify watch for fd=%s, wd=%s", fd, wd);
         // when success, it returns 0.
     }
 
@@ -140,35 +135,27 @@ public class Clib {
     private static native int epoll_ctl(int epfd, int op, int fd, EpollEvent.ByReference ev);
     private static native int epoll_wait (int epfd, Pointer /*EpollEvent[] */ ev, int maxEvents, int timeout);
 
-    public static int tryEpollCreate() throws ClibException {
-        int epfd = epoll_create(1); // epoll_create won't need argument on present Linux. (But we need to use it, sigh)
-        if (epfd < 0) {
-            throw new ClibException("epoll_create failed");
-        }
+    public static int tryEpollCreate() {
+        int epfd = epoll_create(1); // epoll_create won't need argument on present Linux.
+        Preconditions.checkState(epfd >= 0, "epoll_create failed");
         return epfd;
     }
 
-    public static int tryEpollCreate1(int flag) throws ClibException {
+    public static int tryEpollCreate1(int flag) {
         int epfd = epoll_create1(flag);
-        if (epfd < 0) {
-            throw new ClibException("epoll_create1 failed");
-        }
+        Preconditions.checkState(epfd >= 0, "epoll_create1 failed");
         return epfd;
     }
 
-    public static void tryEpollCtl (int epfd, int flag, int fd, Clib.EpollEvent.ByReference ev) throws ClibException {
+    public static void tryEpollCtl (int epfd, int flag, int fd, Clib.EpollEvent.ByReference ev) {
         int retVal = epoll_ctl(epfd, flag, fd, ev);
-        if (retVal < 0) {
-            throw new ClibException("epoll_ctl failed");
-        }
+        Preconditions.checkState(retVal >= 0, "epoll_ctl failed");
         // retVal is always 0 if success. we don't need to return this.
     }
 
-    public static int tryEpollWait(int epfd, Pointer ev, int maxEvents, int timeout) throws ClibException{
+    public static int tryEpollWait(int epfd, Pointer ev, int maxEvents, int timeout) {
         int retVal = epoll_wait(epfd, ev, maxEvents, timeout);
-        if (retVal < 0) {
-            throw new ClibException("epoll_wait is fail");
-        }
+        Preconditions.checkState(retVal >= 0, "epoll_wait failed");
         return retVal;
     }
 
