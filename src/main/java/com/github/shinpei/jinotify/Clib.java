@@ -72,7 +72,7 @@ public class Clib {
         return wd;
     }
 
-    public static void tryInotifyReWatch(int fd, int wd) {
+    public static void tryInotifyRmWatch(int fd, int wd) {
         int retVal = inotify_rm_watch(fd, wd);
         Preconditions.checkState(retVal >= 0, "Couldn't remove inotify watch for fd=%s, wd=%s", fd, wd);
         // when success, it returns 0.

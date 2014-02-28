@@ -1,6 +1,4 @@
 import com.github.shinpei.jinotify.Clib;
-import com.google.common.io.Files;
-import com.sun.jna.Structure;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -16,7 +14,7 @@ public class TestClib {
     public void inotifyAddWatch () throws Exception {
         int fd = Clib.tryInotifyInit();
         int wd = Clib.tryInotifyAddWatch(fd, tempPath, Clib.InotifyConstants.CREATE.value());
-        Clib.tryInotifyReWatch(fd, wd);
+        Clib.tryInotifyRmWatch(fd, wd);
     }
 
     @Test
