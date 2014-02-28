@@ -1,7 +1,6 @@
 import com.google.common.io.Files;
 import org.junit.Ignore;
 import org.junit.Test;
-import com.github.shinpei.jinotify.Clib;
 import com.github.shinpei.jinotify.Jinotify;
 
 public class TestJinotify {
