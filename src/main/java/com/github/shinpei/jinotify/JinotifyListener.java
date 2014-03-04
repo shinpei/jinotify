@@ -81,7 +81,7 @@ public abstract class JinotifyListener extends Thread {
         }
     }
 
-    public void initialize (int epollDescriptor, int inotifyDescriptor, int maxEvents){
+    final public void initialize (int epollDescriptor, int inotifyDescriptor, int maxEvents){
 
         // int cannot be under 0;
         this.epollDescriptor = epollDescriptor;

@@ -35,6 +35,25 @@ public class Jinotify {
     public static final JinotifyEvents MODIFY = JinotifyEvents.MODIFY;
 
     public <LISTENER extends JinotifyListener>
+    void addWatch2(String absolutePath, JinotifyEvents mask, LISTENER listener)
+    throws JinotifyException {
+
+        inotifyDescriptor = Clib.tryInotifyInit();
+        watchingFileDescriptor = Clib.tryInotifyAddWatch(inotifyDescriptor, absolutePath, mask.ivalue());
+        epollDescriptor = Clib.tryEpollCreate();
+
+        Clib.EpollEvent.ByReference epollEvent = new Clib.EpollEvent.ByReference();
+        epollEvent.events = Clib.EpollConstants.IN.value();
+        epollEvent.data.writeField("fd", inotifyDescriptor);
+
+        Clib.tryEpollCtl(epollDescriptor, Clib.EpollConstants.CTL_ADD.value(), inotifyDescriptor, epollEvent);
+
+        listener.initialize(epollDescriptor, inotifyDescriptor, MAX_EVENTS);
+        listener.start();
+
+    }
+
+    public <LISTENER extends JinotifyListener>
     void addWatch(String absolutePath, JinotifyEvents mask, Class<LISTENER> klass)
             throws JinotifyException {
 
