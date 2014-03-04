@@ -14,7 +14,7 @@ public class TestJinotify {
     public void basicEventHandling () throws Exception {
         Jinotify jinotify = new Jinotify();
         MyTestListner listner = new MyTestListner();
-        jinotify.addWatch2(PATH, Jinotify.CREATE, listner);
+        jinotify.addWatch(PATH, Jinotify.CREATE, listner);
 
         Files.createTempDir();
 
@@ -24,14 +24,16 @@ public class TestJinotify {
     @Test
     @Ignore
     public void onModify () throws Exception {
-        class MyListnerModify extends JinotifyListener {
+        class MyListenerModify extends JinotifyListener {
             @Override
             public void onModify() {
                 System.out.println("hey, you modified, huh?");
             }
         }
+
         Jinotify jinotify = new Jinotify();
-        jinotify.addWatch(PATH, Jinotify.MODIFY, MyListnerModify.class);
+        MyListenerModify listener = new MyListenerModify();
+        jinotify.addWatch(PATH, Jinotify.MODIFY, listener);
         File f = Files.createTempDir();
 
         jinotify.closeNotifier();

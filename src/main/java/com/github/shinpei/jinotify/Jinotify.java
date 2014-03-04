@@ -34,8 +34,8 @@ public class Jinotify {
     public static final JinotifyEvents ACCESS = JinotifyEvents.ACCESS;
     public static final JinotifyEvents MODIFY = JinotifyEvents.MODIFY;
 
-    public <LISTENER extends JinotifyListener>
-    void addWatch2(String absolutePath, JinotifyEvents mask, LISTENER listener)
+
+    public void addWatch(String absolutePath, JinotifyEvents mask, JinotifyListener listener)
     throws JinotifyException {
 
         inotifyDescriptor = Clib.tryInotifyInit();
@@ -50,44 +50,6 @@ public class Jinotify {
 
         listener.initialize(epollDescriptor, inotifyDescriptor, MAX_EVENTS);
         listener.start();
-
-    }
-
-    public <LISTENER extends JinotifyListener>
-    void addWatch(String absolutePath, JinotifyEvents mask, Class<LISTENER> klass)
-            throws JinotifyException {
-
-        inotifyDescriptor = Clib.tryInotifyInit();
-        watchingFileDescriptor = Clib.tryInotifyAddWatch(inotifyDescriptor, absolutePath, mask.ivalue());
-        epollDescriptor = Clib.tryEpollCreate();
-
-        Clib.EpollEvent.ByReference epollEvent = new Clib.EpollEvent.ByReference();
-        epollEvent.events = Clib.EpollConstants.IN.value();
-        epollEvent.data.writeField("fd", inotifyDescriptor);
-
-        Clib.tryEpollCtl(epollDescriptor, Clib.EpollConstants.CTL_ADD.value(), inotifyDescriptor, epollEvent);
-
-        // start thread
-        Constructor<LISTENER> constructor = null;
-        try {
-            constructor = klass.getConstructor(LISTENER.getArgumentTypes());
-        } catch (NoSuchMethodException e) {
-            throw new JinotifyException("cannot get constructor" + e.getMessage(), e);
-        }
-
-        try {
-            LISTENER listener = constructor.newInstance();
-            listener.initialize(epollDescriptor, inotifyDescriptor, MAX_EVENTS);
-            listener.start();
-        } catch (IllegalArgumentException e) {
-            throw new JinotifyException(e);
-        } catch (InstantiationException e) {
-            throw new JinotifyException(e);
-        } catch (IllegalAccessException e) {
-            throw new JinotifyException(e);
-        } catch (InvocationTargetException e) {
-            throw new JinotifyException(e);
-        }
 
     }
 
