@@ -19,7 +19,7 @@ public class Clib {
             // for Centos support
             try {
                 Native.register("/lib64/libc.so.6");
-            } catch (Exception e) {
+            } catch (Exception ignored) {
                 // ignore
             }
         }
