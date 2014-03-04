@@ -39,23 +39,23 @@ Events
 ===============
 You can define following event with Jinotify.
 
-Jinotify.onCreate
-		It works on when file or dir is created. 
++ ~Jinotify.onCreate~
+	It works on when file or dir is created. 
 
-Jinotify.onClose
-		It works on when file is closed.
++ Jinotify.onClose
+	It works on when file is closed.
 
-Jinotify.onAccess
-		It works on when file is opened, and read contents. For example, touch.
++ Jinotify.onAccess
+	It works on when file is opened, and read contents. For example, touch.
 
-Jinotify.onModified
-		It works on when file contens are modified. 
++ Jinotify.onModified
+	It works on when file contens are modified. 
 
-Jinotify.onMoved
-		It works on when watching file or dir has moved.
++ Jinotify.onMoved
+	It works on when watching file or dir has moved.
 
-Jinotify.onDelete
-		It works on when watching file or dir has removed.
++ Jinotify.onDelete
+	It works on when watching file or dir has removed.
 
 License, contact info, contribute
 ===============

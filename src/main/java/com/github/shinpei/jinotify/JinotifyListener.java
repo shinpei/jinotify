@@ -45,7 +45,7 @@ public abstract class JinotifyListener extends Thread {
                         | (event.events & Clib.EpollConstants.HUP.value())
                         | -(event.events & Clib.EpollConstants.IN.value())) == 0)
                 {
-                    // Mpust be error
+                    // Must be error
                     // one of the watching inotify decriptor dies
                     Clib.close(event.data.fd);
                     continue;
