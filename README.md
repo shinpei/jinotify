@@ -4,7 +4,7 @@ Jinotify is a file change notificator implemented with inotify(7) and epoll(7). 
 
 Example
 ===============
-First, define your listner.
+First, define your listener.
 
 ```java
 import org.shinpeinkt.jinotify.JinotifyListener;
