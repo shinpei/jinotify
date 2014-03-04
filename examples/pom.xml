@@ -24,10 +24,17 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.github.shinpei.logwatcher.LogWatch</mainClass>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.github.shinpei.logwatcher.LogWatch</mainClass>
+                            <packageName>com.github.shinpei.logwatcher</packageName>
+                            <addClasspath>true</addClasspath>
+                            <addExtensions>true</addExtensions>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
             <plugin>
