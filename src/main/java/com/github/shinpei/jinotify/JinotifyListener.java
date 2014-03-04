@@ -45,7 +45,7 @@ public abstract class JinotifyListener extends Thread {
                         | (event.events & Clib.EpollConstants.HUP.value())
                         | -(event.events & Clib.EpollConstants.IN.value())) == 0)
                 {
-                    // Must be error
+                    // Mpust be error
                     // one of the watching inotify decriptor dies
                     Clib.close(event.data.fd);
                     continue;
@@ -56,7 +56,7 @@ public abstract class JinotifyListener extends Thread {
 
                     int length = Clib.read(event.data.fd, eventBuf.getPointer(), eventBuf.size());
                     if (length == -1) {
-                        Clib.perror("error occured while reading fd=" + event.data.fd);
+                        Clib.perror("error occurred while reading fd=" + event.data.fd);
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) == 0) {
                         this.onCreate();
