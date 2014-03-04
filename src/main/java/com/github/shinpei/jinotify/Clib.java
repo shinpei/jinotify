@@ -10,13 +10,18 @@ public class Clib {
     static
     {
         try {
-            Native.register("/lib64/libc.so.6");
+            Native.register("libc.so.6");
         }
         catch (NoClassDefFoundError e) {
 
         }
         catch (UnsatisfiedLinkError e) {
-
+            // for Centos support
+            try {
+                Native.register("/lib64/libc.so.6");
+            } catch (Exception e) {
+                // ignore
+            }
         }
         catch (NoSuchMethodError e) {
 
