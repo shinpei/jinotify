@@ -9,18 +9,15 @@ First, define your listner.
 ```java
 import org.shinpeinkt.jinotify.JinotifyListener;
 
-public class MyTestListner extends JinotifyListener {
+class MyTestListner extends JinotifyListener {
     public void onCreate () {
         System.out.println("hey, you created something, huh?");
     }
 }
-```
 
-And, call. 
-
-```java
 Jinotify jinotify = new Jinotify();
-jinotify.addWatch("/tmp", Jinotify.CREATE, MyTestListner.class);
+MyListener listener = new MyListener();
+jinotify.addWatch("/tmp", Jinotify.CREATE, listener);
 Files.createTempDir();
 jinotify.closeNotifier();
 ```
