@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.shinpei</groupId>
-    <artifactId>jinotify</artifactId>
+    <artifactId>logwatch</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
     <developers>
@@ -13,7 +13,7 @@
             <id>shinpeinkt</id>
             <name>Shinpei Nakata</name>
             <email>shinpei.nakata@gmail.com</email>
-            <url>http://github.com/shinpeinkt/jinotify</url>
+            <url>http://github.com/shinpeinkt/jinotify/examples</url>
         </developer>
     </developers>
 
@@ -23,6 +23,20 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.github.shinpei.logwatcher.LogWatch</mainClass>
+                            <packageName>com.github.shinpei.logwatcher</packageName>
+                            <addClasspath>true</addClasspath>
+                            <addExtensions>true</addExtensions>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -36,11 +50,6 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
@@ -51,10 +60,10 @@
             <artifactId>guava</artifactId>
             <version>16.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
-        </dependency>
+		<dependency>
+		  <groupId>com.github.shinpei</groupId>
+		  <artifactId>jinotify</artifactId>
+		  <version>0.1.0-SNAPSHOT</version>
+		</dependency>
     </dependencies>
 </project>
