@@ -12,10 +12,12 @@ public class Jinotify {
     final int MAX_EVENTS = 1;
 
     private enum JinotifyEvents {
-        CREATE(Clib.InotifyConstants.CREATE),
         ACCESS(Clib.InotifyConstants.ACCESS),
-        CLOSE(Clib.InotifyConstants.CLOSE),
-        MODIFY(Clib.InotifyConstants.MODIFY);
+        MODIFY(Clib.InotifyConstants.MODIFY),
+        CREATE(Clib.InotifyConstants.CREATE),
+        DELETE(Clib.InotifyConstants.DELETE),
+        MOVE(Clib.InotifyConstants.MOVE),
+        CLOSE(Clib.InotifyConstants.CLOSE);
 
         private final Clib.InotifyConstants value;
 
@@ -30,12 +32,12 @@ public class Jinotify {
         // TODO: need to define bit operators '|'
     }
 
-    public static final JinotifyEvents CREATE = JinotifyEvents.CREATE;
-    public static final JinotifyEvents CLOSE = JinotifyEvents.CLOSE;
     public static final JinotifyEvents ACCESS = JinotifyEvents.ACCESS;
     public static final JinotifyEvents MODIFY = JinotifyEvents.MODIFY;
-
-
+    public static final JinotifyEvents CREATE = JinotifyEvents.CREATE;
+    public static final JinotifyEvents DELETE = JinotifyEvents.DELETE;
+    public static final JinotifyEvents MOVE = JinotifyEvents.MOVE;
+    public static final JinotifyEvents CLOSE = JinotifyEvents.CLOSE;
 
     private List<Boolean> detectOverrideMethod(JinotifyListener listener) throws JinotifyException {
         // detect handler
@@ -45,7 +47,9 @@ public class Jinotify {
                     klass.getMethod("onAccess").getDeclaringClass().equals(JinotifyListener.class),
                     klass.getMethod("onModify").getDeclaringClass().equals(JinotifyListener.class),
                     klass.getMethod("onCreate").getDeclaringClass().equals(JinotifyListener.class),
-                    klass.getMethod("onDelete").getDeclaringClass().equals(JinotifyListener.class)
+                    klass.getMethod("onDelete").getDeclaringClass().equals(JinotifyListener.class),
+                    klass.getMethod("onMove").getDeclaringClass().equals(JinotifyListener.class),
+                    klass.getMethod("onClose").getDeclaringClass().equals(JinotifyListener.class)
             );
             return overrideList;
         } catch (NoSuchMethodException e) {
@@ -68,6 +72,12 @@ public class Jinotify {
         }
         if (overrideList.get(3) == true) {
             mask |= Clib.InotifyConstants.DELETE.value();
+        }
+        if (overrideList.get(4) == true) {
+            mask |= Clib.InotifyConstants.MOVE.value();
+        }
+        if (overrideList.get(5) == true) {
+            mask |= Clib.InotifyConstants.CLOSE.value();
         }
         return mask;
     }

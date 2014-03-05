@@ -1,8 +1,5 @@
 package com.github.shinpei.jinotify;
 
-
-import java.util.List;
-
 public abstract class JinotifyListener extends Thread {
 
     protected int epollDescriptor;
@@ -20,7 +17,8 @@ public abstract class JinotifyListener extends Thread {
     }
 
     static private enum OverrideList {
-        ACCESS(0),MODIFY(1),CREATE(2),DELETE(3);
+        ACCESS(0), MODIFY(1), CREATE(2), DELETE(3), MOVE(4),
+        CLOSE(5);
         public int value;
         OverrideList(int i) { this.value = i; }
     }
@@ -33,11 +31,19 @@ public abstract class JinotifyListener extends Thread {
         // do nothing
     }
 
+    public void onCreate() {
+        // do nothing
+    }
+
     public void onDelete () {
         // do nothing
     }
 
-    public void onCreate() {
+    public void onMove() {
+        // do nothing
+    }
+
+    public void onClose() {
         // do nothing
     }
 
@@ -66,11 +72,11 @@ public abstract class JinotifyListener extends Thread {
                     if (length == -1) {
                         Clib.perror("error occurred while reading fd=" + event.data.fd);
                     }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) == 0) {
-                        this.onCreate();
-                    }
                     else if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) == 0) {
                         this.onAccess();
+                    }
+                    else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) == 0) {
+                        this.onModify();
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) == 0) {
                         this.onCreate();
@@ -78,7 +84,12 @@ public abstract class JinotifyListener extends Thread {
                     else if ((eventBuf.mask & Clib.InotifyConstants.DELETE.value()) == 0) {
                         this.onDelete();
                     }
-
+                    else if ((eventBuf.mask & Clib.InotifyConstants.MOVE.value()) == 0) {
+                        this.onMove();
+                    }
+                    else if ((eventBuf.mask & Clib.InotifyConstants.CLOSE.value()) == 0) {
+                        this.onClose();
+                    }
                 }
                 else {
                     // Could happened??
