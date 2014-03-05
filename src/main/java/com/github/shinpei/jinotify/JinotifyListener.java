@@ -1,6 +1,8 @@
 package com.github.shinpei.jinotify;
 
 
+import java.util.List;
+
 public abstract class JinotifyListener extends Thread {
 
     protected int epollDescriptor;
@@ -8,7 +10,7 @@ public abstract class JinotifyListener extends Thread {
     protected int maxEvents;
     private Clib.EpollEvent[] events;
 
-    public static Class<?>[] getArgumentTypes() {
+    public static final Class<?>[] getArgumentTypes() {
         Class<?>[] ret = {};
         return ret;
     }
@@ -17,6 +19,11 @@ public abstract class JinotifyListener extends Thread {
         // do nothing.
     }
 
+    static private enum OverrideList {
+        ACCESS(0),MODIFY(1),CREATE(2),DELETE(3);
+        public int value;
+        OverrideList(int i) { this.value = i; }
+    }
 
     public void onAccess () {
         // do nothing
@@ -34,12 +41,13 @@ public abstract class JinotifyListener extends Thread {
         // do nothing
     }
 
-
     public void run () {
+
         int numEvents = 0;
+
         while ((numEvents = Clib.tryEpollWait(epollDescriptor, events[0].getPointer(), maxEvents, -1)) > 0) {
-            int i = 0;
-            for (i = 0; i < numEvents; i++) {
+
+            for (int i = 0; i < numEvents; i++) {
                 Clib.EpollEvent event = events[i];
                 if (((event.events & Clib.EpollConstants.ERR.value())
                         | (event.events & Clib.EpollConstants.HUP.value())

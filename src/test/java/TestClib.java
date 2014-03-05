@@ -35,7 +35,6 @@ public class TestClib {
     @Test
     public void inotifyAndEpoll() throws Exception {
         int fd = Clib.tryInotifyInit();
-        int wd = Clib.tryInotifyAddWatch(fd, tempPath, Clib.InotifyConstants.CREATE.value());
         int epfd = Clib.tryEpollCreate();
         Clib.EpollEvent.ByReference eevent = new Clib.EpollEvent.ByReference();
         eevent.events = Clib.EpollConstants.IN.value();

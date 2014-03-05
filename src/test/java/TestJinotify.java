@@ -22,10 +22,8 @@ public class TestJinotify {
 
         Jinotify jinotify = new Jinotify();
         MyListenerCreate listener = new MyListenerCreate();
-        jinotify.addWatch(PATH, Jinotify.CREATE, listener);
-
+        jinotify.addWatch(PATH, listener);
         Files.createTempDir();
-
         jinotify.closeNotifier();
     }
 
@@ -41,8 +39,7 @@ public class TestJinotify {
 
         Jinotify jinotify = new Jinotify();
         MyListenerModify listener = new MyListenerModify();
-        jinotify.addWatch(PATH, Jinotify.MODIFY, listener);
-
+        jinotify.addWatch(PATH, listener);
 
         jinotify.closeNotifier();
     }
