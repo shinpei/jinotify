@@ -8,7 +8,7 @@ public abstract class JinotifyListener extends Thread {
     protected int maxEvents;
     private Clib.EpollEvent[] events;
 
-    public static Class<?>[] getArgumentTypes() {
+    public static final Class<?>[] getArgumentTypes() {
         Class<?>[] ret = {};
         return ret;
     }
@@ -34,9 +34,10 @@ public abstract class JinotifyListener extends Thread {
         // do nothing
     }
 
-
     public void run () {
         int numEvents = 0;
+
+
         while ((numEvents = Clib.tryEpollWait(epollDescriptor, events[0].getPointer(), maxEvents, -1)) > 0) {
             int i = 0;
             for (i = 0; i < numEvents; i++) {

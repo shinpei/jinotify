@@ -1,8 +1,5 @@
 package com.github.shinpei.jinotify;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 public class Jinotify {
     private int inotifyDescriptor;
     private int watchingFileDescriptor;
@@ -49,6 +46,15 @@ public class Jinotify {
         Clib.tryEpollCtl(epollDescriptor, Clib.EpollConstants.CTL_ADD.value(), inotifyDescriptor, epollEvent);
 
         listener.initialize(epollDescriptor, inotifyDescriptor, MAX_EVENTS);
+
+        // detect handler
+        Class klass = listener.getClass();
+        try {
+            System.out.println("Overrided??: " + klass.getMethod("onCreate").getDeclaredAnnotations());
+        } catch (NoSuchMethodException e) {
+            throw new JinotifyException("SEVERE ERROR", e);
+        }
+
         listener.start();
 
     }
