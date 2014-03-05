@@ -10,6 +10,7 @@ First, define your listener.
 import org.shinpeinkt.jinotify.JinotifyListener;
 
 class MyTestListner extends JinotifyListener {
+    @Override
     public void onCreate () {
         System.out.println("hey, you created something, huh?");
     }
@@ -17,7 +18,7 @@ class MyTestListner extends JinotifyListener {
 
 Jinotify jinotify = new Jinotify();
 MyListener listener = new MyListener();
-jinotify.addWatch("/tmp", Jinotify.CREATE, listener);
+jinotify.addWatch("/tmp", listener);
 Files.createTempDir();
 jinotify.closeNotifier();
 ```
@@ -34,7 +35,7 @@ Install (Maven)
 
 Events
 ===============
-You can define following event with Jinotify.
+You can define following event with Jinotify. If you override methods below, it'll automatically watch event.
 
 + `Jinotify.onCreate`
 	It works on when file or dir is created. 
