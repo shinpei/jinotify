@@ -2,11 +2,15 @@ package com.github.shinpei.jinotify;
 
 import com.google.common.base.Preconditions;
 import com.sun.jna.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class Clib {
+
+    private static final Logger logger = LoggerFactory.getLogger("Clib");
     static
     {
         try {
@@ -73,7 +77,7 @@ public class Clib {
     //TODO: made mask type checkable
     public static int tryInotifyAddWatch(int fd, String path, int mask) {
         int wd = inotify_add_watch(fd, path,  mask);
-        System.out.printf("Add watch for %s, mask=%x, and wd=%d\n", path, mask, wd);
+        logger.info("Add watch for {}, mask={}, and wd={}", path, mask, wd);
         Preconditions.checkState(wd >= 0, "Couldn't add inotify watch for path=" + path);
         return wd;
     }

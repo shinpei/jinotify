@@ -15,7 +15,7 @@ public class TestJinotify {
 
         class MyListenerCreate extends  JinotifyListener {
             @Override
-            public void onCreate () {
+            public void onAccess () {
                 System.out.println("hey, you created something, hun?");
             }
         }
@@ -32,7 +32,7 @@ public class TestJinotify {
 
         class MyListenerModify extends JinotifyListener {
             @Override
-            public void onModify() {
+            public void onAccess() {
                 System.out.println("hey, you modified, huh?");
             }
         }

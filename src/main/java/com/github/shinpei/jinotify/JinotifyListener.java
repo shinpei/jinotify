@@ -1,11 +1,16 @@
 package com.github.shinpei.jinotify;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class JinotifyListener extends Thread {
 
     protected int epollDescriptor;
     protected int inotifyDescriptor;
     protected int maxEvents;
     private Clib.EpollEvent[] events;
+
+    private static final Logger logger = LoggerFactory.getLogger(Jinotify.class);
 
     public static final Class<?>[] getArgumentTypes() {
         Class<?>[] ret = {};
@@ -25,6 +30,7 @@ public abstract class JinotifyListener extends Thread {
 
     public void onAccess () {
         // do nothing
+        System.out.println("Default");
     }
 
     public void onModify () {
@@ -50,10 +56,11 @@ public abstract class JinotifyListener extends Thread {
     public void run () {
 
         int numEvents = 0;
-
+        logger.info("MAX events={}, epfd={},fd={}", maxEvents, epollDescriptor, inotifyDescriptor);
         while ((numEvents = Clib.tryEpollWait(epollDescriptor, events[0].getPointer(), maxEvents, -1)) > 0) {
-
+            logger.info("Arrived Events={}", numEvents);
             for (int i = 0; i < numEvents; i++) {
+                events[i].read();
                 Clib.EpollEvent event = events[i];
                 if (((event.events & Clib.EpollConstants.ERR.value())
                         | (event.events & Clib.EpollConstants.HUP.value())
@@ -61,16 +68,18 @@ public abstract class JinotifyListener extends Thread {
                 {
                     // Must be error
                     // one of the watching inotify decriptor dies
-                    System.out.println("ERROR, " + event.events);
+
                     Clib.close(event.data.fd);
+                    // TODO: we need to stop this thread
+                    Clib.perror("Seems watching descriptor closed");
                     continue;
                 }
                 else if (inotifyDescriptor == event.data.fd) {
                     // Must be ready for read inotify
-                    System.out.println("Something!");
                     Clib.InotifyEvent eventBuf = new Clib.InotifyEvent();
-
                     int length = Clib.read(event.data.fd, eventBuf.getPointer(), eventBuf.size());
+                    eventBuf.read();
+                    logger.info("length={}, mask={}, create={}", length, eventBuf.mask, Clib.InotifyConstants.CREATE.value());
                     if (length == -1) {
                         Clib.perror("error occurred while reading fd=" + event.data.fd);
                     }
@@ -95,7 +104,7 @@ public abstract class JinotifyListener extends Thread {
                 }
                 else {
                     // Could happened??
-                    System.err.println("get epoll event for fd=" + event.data.fd);
+                    logger.error("get epoll event for fd={}", event.data.fd);
                 }
             }
             break;
@@ -108,6 +117,7 @@ public abstract class JinotifyListener extends Thread {
         this.epollDescriptor = epollDescriptor;
         this.inotifyDescriptor = inotifyDescriptor;
         this.maxEvents = maxEvents;
+
         this.events = (Clib.EpollEvent[])(new Clib.EpollEvent()).toArray(maxEvents);
     }
 
