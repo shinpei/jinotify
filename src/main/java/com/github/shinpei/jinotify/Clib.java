@@ -73,13 +73,14 @@ public class Clib {
     //TODO: made mask type checkable
     public static int tryInotifyAddWatch(int fd, String path, int mask) {
         int wd = inotify_add_watch(fd, path,  mask);
-        Preconditions.checkState(wd >= 0, "Couldn't add inotify watch");
+        System.out.printf("Add watch for %s, mask=%x, and wd=%d\n", path, mask, wd);
+        Preconditions.checkState(wd >= 0, "Couldn't add inotify watch for path=" + path);
         return wd;
     }
 
     public static void tryInotifyRmWatch(int fd, int wd) {
         int retVal = inotify_rm_watch(fd, wd);
-        Preconditions.checkState(retVal >= 0, "Couldn't remove inotify watch for fd=%s, wd=%s", fd, wd);
+        Preconditions.checkState(retVal == 0, "Couldn't remove inotify watch for fd=%s, wd=%s", fd, wd);
         // when success, it returns 0.
     }
 

@@ -9,14 +9,22 @@ public class LogWatch {
         Jinotify jinotify = new Jinotify();
         class MyListener extends JinotifyListener {
             @Override
-            public void onModify() {
+            public void onCreate() {
                 System.out.println("hi");
             }
         }
+
         try {
-            jinotify.addWatch("/var/log/system.log", Jinotify.MODIFY, new MyListener());
+            jinotify.addWatch("/tmp", new MyListener());
 
         } catch (Exception e) {
+
+        }
+        try {
+        while(true) {
+            Thread.sleep(10000);
+        }
+        }catch (Exception e) {
 
         }
         jinotify.closeNotifier();

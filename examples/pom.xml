@@ -7,6 +7,9 @@
     <groupId>com.github.shinpei</groupId>
     <artifactId>logwatch</artifactId>
     <version>0.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>logwatch</name>
+    <url>http://www.github.com/shinpeinkt/jinotify/examples</url>
 
     <developers>
         <developer>
@@ -19,22 +22,22 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdk.version>1.6</jdk.version>
     </properties>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifest>
                             <mainClass>com.github.shinpei.logwatcher.LogWatch</mainClass>
-                            <packageName>com.github.shinpei.logwatcher</packageName>
-                            <addClasspath>true</addClasspath>
-                            <addExtensions>true</addExtensions>
                         </manifest>
                     </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
             </plugin>
             <plugin>
@@ -60,10 +63,10 @@
             <artifactId>guava</artifactId>
             <version>16.0</version>
         </dependency>
-		<dependency>
-		  <groupId>com.github.shinpei</groupId>
-		  <artifactId>jinotify</artifactId>
-		  <version>0.1.0-SNAPSHOT</version>
-		</dependency>
+        <dependency>
+            <groupId>com.github.shinpei</groupId>
+            <artifactId>jinotify</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

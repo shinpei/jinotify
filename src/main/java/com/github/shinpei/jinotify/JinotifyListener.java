@@ -61,11 +61,13 @@ public abstract class JinotifyListener extends Thread {
                 {
                     // Must be error
                     // one of the watching inotify decriptor dies
+                    System.out.println("ERROR, " + event.events);
                     Clib.close(event.data.fd);
                     continue;
                 }
                 else if (inotifyDescriptor == event.data.fd) {
                     // Must be ready for read inotify
+                    System.out.println("Something!");
                     Clib.InotifyEvent eventBuf = new Clib.InotifyEvent();
 
                     int length = Clib.read(event.data.fd, eventBuf.getPointer(), eventBuf.size());
