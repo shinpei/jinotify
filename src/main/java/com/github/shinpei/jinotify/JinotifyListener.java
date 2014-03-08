@@ -62,7 +62,8 @@ public abstract class JinotifyListener extends Thread {
             for (int i = 0; i < numEvents; i++) {
                 events[i].read();
                 Clib.EpollEvent event = events[i];
-                if (((event.events & Clib.EpollConstants.ERR.value())
+                if (
+                        ((event.events & Clib.EpollConstants.ERR.value())
                         | (event.events & Clib.EpollConstants.HUP.value())
                         | -(event.events & Clib.EpollConstants.IN.value())) == 0)
                 {
@@ -79,26 +80,27 @@ public abstract class JinotifyListener extends Thread {
                     Clib.InotifyEvent eventBuf = new Clib.InotifyEvent();
                     int length = Clib.read(event.data.fd, eventBuf.getPointer(), eventBuf.size());
                     eventBuf.read();
-                    logger.info("length={}, mask={}, create={}", length, eventBuf.mask, Clib.InotifyConstants.CREATE.value());
+                    logger.info("length={}, mask={}, create={}", length, Integer.toHexString(eventBuf.mask), Integer.toHexString(Clib.InotifyConstants.CREATE.value()));
+                    logger.info("mask={}", Integer.toBinaryString(eventBuf.mask));
                     if (length == -1) {
                         Clib.perror("error occurred while reading fd=" + event.data.fd);
                     }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) == 0) {
+                    else if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
                         this.onAccess();
                     }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) == 0) {
+                    else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
                         this.onModify();
                     }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) == 0) {
+                    else if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) != 0) {
                         this.onCreate();
                     }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.DELETE.value()) == 0) {
+                    else if ((eventBuf.mask & Clib.InotifyConstants.DELETE.value()) != 0) {
                         this.onDelete();
                     }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.MOVE.value()) == 0) {
+                    else if ((eventBuf.mask & Clib.InotifyConstants.MOVE.value()) != 0) {
                         this.onMove();
                     }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.CLOSE.value()) == 0) {
+                    else if ((eventBuf.mask & Clib.InotifyConstants.CLOSE.value()) != 0) {
                         this.onClose();
                     }
                 }

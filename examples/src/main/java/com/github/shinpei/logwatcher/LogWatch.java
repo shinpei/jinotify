@@ -9,13 +9,13 @@ public class LogWatch {
         Jinotify jinotify = new Jinotify();
         class MyListener extends JinotifyListener {
             @Override
+            public void onCreate() {
+                System.out.println("Created!!");
+            }
+
+            @Override
             public void onAccess() {
-                System.out.println("Accessed!!");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                System.out.println("Access!!");
             }
         }
         MyListener listener = new MyListener();
@@ -24,6 +24,9 @@ public class LogWatch {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        jinotify.closeNotifier();
+        while(true) {
+
+        }
+//        jinotify.closeNotifier();
     }
 }
