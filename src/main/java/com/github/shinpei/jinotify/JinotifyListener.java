@@ -11,11 +11,6 @@ public abstract class JinotifyListener extends Thread {
 
     private static final D D = new D(LoggerFactory.getLogger(Jinotify.class));
 
-    public static final Class<?>[] getArgumentTypes() {
-        Class<?>[] ret = {};
-        return ret;
-    }
-
     protected JinotifyListener () {
         // do nothing.
     }
@@ -32,22 +27,24 @@ public abstract class JinotifyListener extends Thread {
         D.d("invokeing default Access handler {}", path);
     }
 
-    public void onModify () {
+    public void onModify (String path) {
         // do nothing
-        D.d("invokeing default Modify handler");
+        D.d("invokeing default Modify handler {}", path);
     }
 
-    public void onCreate() {
+    public void onCreate(String path) {
         // do nothing
-        D.d("invokeing default Create handler");
+        D.d("invokeing default Create handler {}", path);
     }
 
-    public void onDelete () {
+    public void onDelete (String path) {
         // do nothing
+        D.d("invokeing default Delete handler {}", path);
     }
 
-    public void onMove() {
+    public void onMove (String path) {
         // do nothing
+        D.d("invokeing default Move handler {}", path);
     }
 
     public void onClose() {
@@ -86,24 +83,27 @@ public abstract class JinotifyListener extends Thread {
                     if (length == -1) {
                         Clib.perror("error occurred while reading fd=" + event.data.fd);
                     }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
-                        //this.onAccess(new String(eventBuf.name));
-                        this.onAccess(new String(eventBuf.name));
-                    }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
-                        this.onModify();
-                    }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) != 0) {
-                        this.onCreate();
-                    }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.DELETE.value()) != 0) {
-                        this.onDelete();
-                    }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.MOVE.value()) != 0) {
-                        this.onMove();
-                    }
-                    else if ((eventBuf.mask & Clib.InotifyConstants.CLOSE.value()) != 0) {
-                        this.onClose();
+                    else {
+                        String path = new String(eventBuf.name);
+                        if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
+                            //this.onAccess(new String(eventBuf.name));
+                            this.onAccess(path);
+                        }
+                        else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
+                            this.onModify(path);
+                        }
+                        else if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) != 0) {
+                            this.onCreate(path);
+                        }
+                        else if ((eventBuf.mask & Clib.InotifyConstants.DELETE.value()) != 0) {
+                            this.onDelete(path);
+                        }
+                        else if ((eventBuf.mask & Clib.InotifyConstants.MOVE.value()) != 0) {
+                            this.onMove(path);
+                        }
+                        else if ((eventBuf.mask & Clib.InotifyConstants.CLOSE.value()) != 0) {
+                            this.onClose();
+                        }
                     }
                 }
                 else {

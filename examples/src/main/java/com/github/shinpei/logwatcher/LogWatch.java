@@ -9,8 +9,8 @@ public class LogWatch {
         Jinotify jinotify = new Jinotify();
         class MyListener extends JinotifyListener {
             @Override
-            public void onCreate() {
-                System.out.println("Created!!");
+            public void onCreate(String path) {
+                System.out.println("Created: " + path);
             }
 
             @Override
