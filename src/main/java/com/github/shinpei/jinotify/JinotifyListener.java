@@ -1,6 +1,5 @@
 package com.github.shinpei.jinotify;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class JinotifyListener extends Thread {
@@ -28,9 +27,9 @@ public abstract class JinotifyListener extends Thread {
         OverrideList(int i) { this.value = i; }
     }
 
-    public void onAccess () {
+    public void onAccess (String path) {
         // do nothing
-        D.d("invokeing default Access handler");
+        D.d("invokeing default Access handler {}", path);
     }
 
     public void onModify () {
@@ -89,7 +88,7 @@ public abstract class JinotifyListener extends Thread {
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
                         //this.onAccess(new String(eventBuf.name));
-                        this.onAccess();
+                        this.onAccess(new String(eventBuf.name));
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
                         this.onModify();

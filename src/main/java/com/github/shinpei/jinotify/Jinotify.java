@@ -2,7 +2,6 @@ package com.github.shinpei.jinotify;
 
 import com.google.common.collect.Lists;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 
 public class Jinotify {
@@ -51,13 +50,13 @@ public class Jinotify {
         final Class klass = listener.getClass();
         try {
             List<Boolean> overrideList = Lists.newArrayList(
-                    !klass.getMethod("onAccess").getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onAccess", String.class).getDeclaringClass().equals(JinotifyListener.class),
                     !klass.getMethod("onModify").getDeclaringClass().equals(JinotifyListener.class),
                     !klass.getMethod("onCreate").getDeclaringClass().equals(JinotifyListener.class),
                     !klass.getMethod("onDelete").getDeclaringClass().equals(JinotifyListener.class),
                     !klass.getMethod("onMove").getDeclaringClass().equals(JinotifyListener.class),
                     !klass.getMethod("onClose").getDeclaringClass().equals(JinotifyListener.class)
-            );
+                    );
             return overrideList;
         } catch (NoSuchMethodException e) {
             throw new JinotifyException("SEVERE: Couldn't detect overrides methods, something wrong with your listener", e);
