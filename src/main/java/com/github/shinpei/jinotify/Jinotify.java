@@ -60,7 +60,7 @@ public class Jinotify {
             );
             return overrideList;
         } catch (NoSuchMethodException e) {
-            throw new JinotifyException("SEVERE ERROR", e);
+            throw new JinotifyException("SEVERE: Couldn't detect overrides methods, something wrong with your listener", e);
         }
 
     }

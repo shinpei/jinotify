@@ -28,7 +28,7 @@ public abstract class JinotifyListener extends Thread {
         OverrideList(int i) { this.value = i; }
     }
 
-    public void onAccess (String path) {
+    public void onAccess () {
         // do nothing
         D.d("invokeing default Access handler");
     }
@@ -88,7 +88,8 @@ public abstract class JinotifyListener extends Thread {
                         Clib.perror("error occurred while reading fd=" + event.data.fd);
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
-                        this.onAccess(new String(eventBuf.name));
+                        //this.onAccess(new String(eventBuf.name));
+                        this.onAccess();
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
                         this.onModify();
