@@ -77,7 +77,7 @@ public class Clib {
     //TODO: made mask type checkable
     public static int tryInotifyAddWatch(int fd, String path, int mask) {
         int wd = inotify_add_watch(fd, path,  mask);
-        logger.info("Add watch for {}, mask={}, and wd={}", path, mask, wd);
+        logger.debug("Add watch for {}, mask={}, and wd={}", path, mask, wd);
         Preconditions.checkState(wd >= 0, "Couldn't add inotify watch for path=" + path);
         return wd;
     }
