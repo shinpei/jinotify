@@ -5,30 +5,39 @@ import org.slf4j.Logger;
 public class D {
     private static Logger logger;
 
-    D(Logger logger) {
+    D(final Logger logger) {
         this.logger = logger;
     }
 
-    final public void d(String msg) {
+    final public void d(final String msg) {
         logger.debug(msg);
     }
 
-    final public void d(String fmt, Object... objs) {
-        logger.debug(fmt, objs);
+    final public void d(final String maker, final Object... objs) {
+        logger.debug(maker, objs);
     }
 
-    final public void i(String msg) {
+    final public void i(final String msg) {
         logger.info(msg);
     }
 
-    final public void i(String fmt, Object... objs) {
-        logger.info(fmt, objs);
+    final public void i(final String maker, final Object... objs) {
+        logger.info(maker, objs);
     }
 
-    final public void e(String msg) {
+    final public void e(final String msg) {
         logger.error(msg);
     }
-    final public void e(String fmt, Object... objs) {
-        logger.error(fmt, objs);
+
+    final public void e(final String maker, final Object... objs) {
+        logger.error(maker, objs);
+    }
+
+    final public void w(final String msg)  {
+        logger.warn(msg);
+    }
+
+    final public void w(final String maker, final Object... objs) {
+        logger.warn(maker, objs);
     }
 }
