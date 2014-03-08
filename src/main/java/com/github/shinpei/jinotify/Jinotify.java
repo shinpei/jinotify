@@ -1,6 +1,7 @@
 package com.github.shinpei.jinotify;
 
 import com.google.common.collect.Lists;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -10,6 +11,11 @@ public class Jinotify {
     private int epollDescriptor;
 
     final int MAX_EVENTS = 1;
+    private static D D;
+
+    {
+        D = new D(LoggerFactory.getLogger(this.getClass()));
+    }
 
     private enum JinotifyEvents {
         ACCESS(Clib.InotifyConstants.ACCESS),
@@ -23,6 +29,7 @@ public class Jinotify {
 
         JinotifyEvents(final Clib.InotifyConstants value) {
             this.value = value;
+
         }
 
         public final int ivalue() {

@@ -14,8 +14,8 @@ public class LogWatch {
             }
 
             @Override
-            public void onAccess() {
-                System.out.println("Access!!");
+            public void onAccess(String path) {
+                System.out.println("Access to " + path);
             }
         }
         MyListener listener = new MyListener();

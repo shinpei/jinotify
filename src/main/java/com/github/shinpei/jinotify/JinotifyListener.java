@@ -10,7 +10,7 @@ public abstract class JinotifyListener extends Thread {
     protected int maxEvents;
     private Clib.EpollEvent[] events;
 
-    private static final Logger logger = LoggerFactory.getLogger(Jinotify.class);
+    private static final D D = new D(LoggerFactory.getLogger(Jinotify.class));
 
     public static final Class<?>[] getArgumentTypes() {
         Class<?>[] ret = {};
@@ -28,17 +28,19 @@ public abstract class JinotifyListener extends Thread {
         OverrideList(int i) { this.value = i; }
     }
 
-    public void onAccess () {
+    public void onAccess (String path) {
         // do nothing
-        System.out.println("Default");
+        D.d("invokeing default Access handler");
     }
 
     public void onModify () {
         // do nothing
+        D.d("invokeing default Modify handler");
     }
 
     public void onCreate() {
         // do nothing
+        D.d("invokeing default Create handler");
     }
 
     public void onDelete () {
@@ -56,9 +58,9 @@ public abstract class JinotifyListener extends Thread {
     public void run () {
 
         int numEvents = 0;
-        logger.debug("MAX events={}, epfd={},fd={}", maxEvents, epollDescriptor, inotifyDescriptor);
+        D.d("MAX events={}, epfd={},fd={}", maxEvents, epollDescriptor, inotifyDescriptor);
         while ((numEvents = Clib.tryEpollWait(epollDescriptor, events[0].getPointer(), maxEvents, -1)) > 0) {
-            logger.debug("Arrived Events={}", numEvents);
+            D.d("Arrived Events={}", numEvents);
             for (int i = 0; i < numEvents; i++) {
                 events[i].read();
                 Clib.EpollEvent event = events[i];
@@ -80,13 +82,13 @@ public abstract class JinotifyListener extends Thread {
                     Clib.InotifyEvent eventBuf = new Clib.InotifyEvent();
                     int length = Clib.read(event.data.fd, eventBuf.getPointer(), eventBuf.size());
                     eventBuf.read();
-                    logger.debug("length={}, mask={}, create={}", length, Integer.toHexString(eventBuf.mask), Integer.toHexString(Clib.InotifyConstants.CREATE.value()));
-                    logger.debug("mask={}", Integer.toBinaryString(eventBuf.mask));
+                    D.d("length={}, mask={}, create={}", length, Integer.toHexString(eventBuf.mask), Integer.toHexString(Clib.InotifyConstants.CREATE.value()));
+                    D.d("mask={}", Integer.toBinaryString(eventBuf.mask));
                     if (length == -1) {
                         Clib.perror("error occurred while reading fd=" + event.data.fd);
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
-                        this.onAccess();
+                        this.onAccess(new String(eventBuf.name));
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
                         this.onModify();
@@ -106,7 +108,7 @@ public abstract class JinotifyListener extends Thread {
                 }
                 else {
                     // Could happened??
-                    logger.error("get epoll event for fd={}", event.data.fd);
+                    D.e("get epoll event for fd={}", event.data.fd);
                 }
             }
             break;
