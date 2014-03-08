@@ -9,8 +9,8 @@ import com.github.shinpei.jinotify.*;
 
 class MyListner extends JinotifyListener {
     @Override
-    public void onCreate () {
-        System.out.println("hey, you created something, huh?");
+    public void onCreate (String path) {
+        System.out.println("hey, you created " + path + ", huh?");
     }
 }
 
@@ -35,10 +35,10 @@ Events
 You can define following event with Jinotify. If you override methods below, it'll automatically watch event.
 
 + `Jinotify.onCreate`
-	It works on when file or dir is created. 
+	works on when watching file or dir is created, modified file name is given as an argument.
 
 + `Jinotify.onAccess`
-	It works on when file is opened, and read contents. For example, touch.
+	It works on when file is opened, and read contents. For example, open watching files for reading.
 
 + `Jinotify.onModified`
 	It works on when file contents are modified.
