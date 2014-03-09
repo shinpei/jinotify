@@ -16,15 +16,23 @@ public class LogWatch {
         {
             {
                 acceptsAll(asList("h", "help"), "show help");
-                acceptsAll(asList("v", "verbose"), "show verbose mode");
+                acceptsAll(asList("v", "verbose"), "show info log");
+                acceptsAll(asList("f", "file")).withRequiredArg().ofType(String.class)
+                        .describedAs("specify file or dir you want to watch");
+                acceptsAll(asList("d", "debug"), "show debug log");
             }
         };
 
         OptionSet options = optionParser.parse(args);
         boolean isVerboseMode = false;
+        boolean isDebugMode = false;
+
         try {
             if (options.has("help")) {
                 optionParser.printHelpOn(System.out);
+            }
+            if (options.has("debug")) {
+                isDebugMode = true;
             }
             if (options.has("verbose")) {
                 isVerboseMode = true;
@@ -34,7 +42,7 @@ public class LogWatch {
         }
 
 
-        Jinotify jinotify = new Jinotify(isVerboseMode);
+        Jinotify jinotify = new Jinotify(isVerboseMode, isDebugMode);
         class MyListener extends JinotifyListener {
             @Override
             public void onCreate(String path) {

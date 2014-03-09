@@ -13,11 +13,16 @@ public class Jinotify {
     private static D D;
 
     public Jinotify () {
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "warn");
         D = new D(LoggerFactory.getLogger(this.getClass()));
     }
 
-    public Jinotify (boolean isVerboseMode){
+    public Jinotify (final boolean isVerboseMode, final boolean isDebugMode){
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "warn");
         if (isVerboseMode) {
+            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
+        }
+        if (isDebugMode) {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         }
         D = new D(LoggerFactory.getLogger(this.getClass()));
@@ -38,11 +43,10 @@ public class Jinotify {
 
         }
 
-        public final int ivalue() {
+        public final int value() {
             return value.value();
         }
 
-        // TODO: need to define bit operators '|'
     }
 
     public static final JinotifyEvents ACCESS = JinotifyEvents.ACCESS;
@@ -75,22 +79,22 @@ public class Jinotify {
         int mask = 0;
         if (overrideList.get(0) == true) {
             // access
-            mask |= Clib.InotifyConstants.ACCESS.value();
+            mask |= ACCESS.value();
         }
         if (overrideList.get(1) == true) {
-            mask |= Clib.InotifyConstants.MODIFY.value();
+            mask |= MODIFY.value();
         }
         if (overrideList.get(2) == true) {
-            mask |= Clib.InotifyConstants.CREATE.value();
+            mask |= CREATE.value();
         }
         if (overrideList.get(3) == true) {
-            mask |= Clib.InotifyConstants.DELETE.value();
+            mask |= DELETE.value();
         }
         if (overrideList.get(4) == true) {
-            mask |= Clib.InotifyConstants.MOVE.value();
+            mask |= MOVE.value();
         }
         if (overrideList.get(5) == true) {
-            mask |= Clib.InotifyConstants.CLOSE.value();
+            mask |= CLOSE.value();
         }
         return mask;
     }

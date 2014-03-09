@@ -17,6 +17,7 @@ public class Clib {
         D = new D(LoggerFactory.getLogger(Clib.class));
         try {
             Native.register("libc.so.6");
+            D.i("successfully registered libc");
         }
         catch (NoClassDefFoundError e) {
 
@@ -25,6 +26,7 @@ public class Clib {
             // for Centos support
             try {
                 Native.register("/lib64/libc.so.6");
+                D.i("successfully registered /lib64/libc.so.6");
             } catch (Exception ignored) {
                 // ignore
             }
