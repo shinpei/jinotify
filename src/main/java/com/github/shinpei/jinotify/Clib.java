@@ -10,7 +10,6 @@ import java.util.List;
 
 public class Clib {
 
-    private static final Logger logger = LoggerFactory.getLogger("Clib");
     private static D D;
 
     static

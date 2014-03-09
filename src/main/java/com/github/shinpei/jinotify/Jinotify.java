@@ -12,7 +12,14 @@ public class Jinotify {
     final int MAX_EVENTS = 1;
     private static D D;
 
-    {
+    public Jinotify () {
+        D = new D(LoggerFactory.getLogger(this.getClass()));
+    }
+
+    public Jinotify (boolean isVerboseMode){
+        if (isVerboseMode) {
+            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+        }
         D = new D(LoggerFactory.getLogger(this.getClass()));
     }
 
