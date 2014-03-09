@@ -52,65 +52,76 @@ public abstract class JinotifyListener extends Thread {
         D.d("invoking default Close handler {}", path);
     }
 
+    final private Clib.InotifyEvent[] readInotifyEvent() {
+
+        return null;
+    }
+
+
     public void run () {
 
         int numEvents = 0;
         D.d("max_events={}, epfd={},fd={}", maxEvents, epollDescriptor, inotifyDescriptor);
-        while ((numEvents = Clib.tryEpollWait(epollDescriptor, events[0].getPointer(), maxEvents, -1)) > 0) {
-            D.d("Arrived Events={}", numEvents);
-            for (int i = 0; i < numEvents; i++) {
-                events[i].read();
-                Clib.EpollEvent event = events[i];
-                if (
-                        ((event.events & Clib.EpollConstants.ERR.value())
-                        | (event.events & Clib.EpollConstants.HUP.value())
-                        | -(event.events & Clib.EpollConstants.IN.value())) == 0)
-                {
-                    // Must be error
-                    // one of the watching inotify decriptor dies
+        while ((numEvents = Clib.tryEpollWait(epollDescriptor, events[0].getPointer(), 1, -1)) > 0) {
+            try {
+                Thread.currentThread().sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-                    Clib.close(event.data.fd);
-                    // TODO: we need to stop this thread
-                    Clib.perror("Seems watching descriptor closed");
-                    continue;
-                }
-                else if (inotifyDescriptor == event.data.fd) {
-                    // Must be ready for read inotify
-                    Clib.InotifyEvent eventBuf = new Clib.InotifyEvent();
-                    int length = Clib.read(event.data.fd, eventBuf.getPointer(), eventBuf.size());
-                    eventBuf.read();
-                    D.d("readByteLength={}, len={}, mask={}, create={}", length, eventBuf.len, Integer.toHexString(eventBuf.mask), Integer.toHexString(Clib.InotifyConstants.CREATE.value()));
-                    D.d("mask={}", Integer.toBinaryString(eventBuf.mask));
-                    if (length == -1) {
-                        Clib.perror("error occurred while reading fd=" + event.data.fd);
-                    }
-                    else {
-                        String path = new String(eventBuf.name);
-                        if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
-                            //this.onAccess(new String(eventBuf.name));
-                            this.onAccess(path);
-                        }
-                        else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
-                            this.onModify(path);
-                        }
-                        else if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) != 0) {
-                            this.onCreate(path);
-                        }
-                        else if ((eventBuf.mask & Clib.InotifyConstants.DELETE.value()) != 0) {
-                            this.onDelete(path);
-                        }
-                        else if ((eventBuf.mask & Clib.InotifyConstants.MOVE.value()) != 0) {
-                            this.onMove(path);
-                        }
-                        else if ((eventBuf.mask & Clib.InotifyConstants.CLOSE.value()) != 0) {
-                            this.onClose(path);
-                        }
-                    }
+            events[0].read();
+            Clib.EpollEvent event = events[0];
+            if (
+                    ((event.events & Clib.EpollConstants.ERR.value())
+                    | (event.events & Clib.EpollConstants.HUP.value())
+                    | -(event.events & Clib.EpollConstants.IN.value())) == 0)
+            {
+                // Must be error
+                // one of the watching inotify decriptor dies
+
+                Clib.close(event.data.fd);
+                // TODO: we need to stop this thread
+                Clib.perror("Seems watching descriptor closed");
+                continue;
+            }
+            else if (inotifyDescriptor == event.data.fd) {
+                // Must be ready for read inotify
+                Clib.InotifyEvent eventBuf = new Clib.InotifyEvent();
+                D.d("Arrived Events={}, size={}", numEvents, eventBuf.size());
+
+                int length = Clib.read(event.data.fd, eventBuf.getPointer(), eventBuf.size());
+                eventBuf.read();
+                D.d("readByteLength={}, len={}, mask={}, create={}", length, eventBuf.len, Integer.toHexString(eventBuf.mask), Integer.toHexString(Clib.InotifyConstants.CREATE.value()));
+                D.d("mask={}", Integer.toBinaryString(eventBuf.mask));
+                if (length == -1) {
+                    Clib.perror("error occurred while reading fd=" + event.data.fd);
                 }
                 else {
-                    // Could happened??
-                    D.e("get epoll event for fd={}", event.data.fd);
+                    String path = new String(eventBuf.name);
+                    if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
+                        //this.onAccess(new String(eventBuf.name));
+                        this.onAccess(path);
+                    }
+                    else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
+                        this.onModify(path);
+                    }
+                    else if ((eventBuf.mask & Clib.InotifyConstants.CREATE.value()) != 0) {
+                        this.onCreate(path);
+                    }
+                    else if ((eventBuf.mask & Clib.InotifyConstants.DELETE.value()) != 0) {
+                        this.onDelete(path);
+                    }
+                    else if ((eventBuf.mask & Clib.InotifyConstants.MOVE.value()) != 0) {
+                        this.onMove(path);
+                    }
+                    else if ((eventBuf.mask & Clib.InotifyConstants.CLOSE.value()) != 0) {
+                        this.onClose(path);
+                    }
                 }
+            }
+            else {
+                // Could happened??
+                D.e("get epoll event for fd={}", event.data.fd);
             }
         }
         D.d("finished running");
