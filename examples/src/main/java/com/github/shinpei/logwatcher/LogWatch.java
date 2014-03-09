@@ -26,7 +26,7 @@ public class LogWatch {
         OptionSet options = optionParser.parse(args);
         boolean isVerboseMode = false;
         boolean isDebugMode = false;
-
+        String targetPath = "";
         try {
             if (options.has("help")) {
                 optionParser.printHelpOn(System.out);
@@ -36,6 +36,11 @@ public class LogWatch {
             }
             if (options.has("verbose")) {
                 isVerboseMode = true;
+            }
+            if (options.has("file")) {
+                targetPath = (String)options.valueOf("file");
+            } else {
+                targetPath = "/tmp";
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -56,8 +61,11 @@ public class LogWatch {
         }
 
         MyListener listener = new MyListener();
+        if (targetPath.isEmpty()) {
+            System.err.println("file path is empty, please specify it with -f option, see help (with -h, -help)");
+        }
         try {
-            jinotify.addWatch("/tmp", listener);
+            jinotify.addWatch(targetPath, listener);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
