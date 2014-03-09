@@ -112,8 +112,8 @@ public abstract class JinotifyListener extends Thread {
                     D.e("get epoll event for fd={}", event.data.fd);
                 }
             }
-            break;
         }
+        D.d("finished running");
     }
 
     final public void initialize (int epollDescriptor, int inotifyDescriptor, int maxEvents){
