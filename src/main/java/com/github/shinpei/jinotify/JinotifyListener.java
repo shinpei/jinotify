@@ -24,38 +24,38 @@ public abstract class JinotifyListener extends Thread {
 
     public void onAccess (String path) {
         // do nothing
-        D.d("invokeing default Access handler {}", path);
+        D.d("invoking default Access handler {}", path);
     }
 
     public void onModify (String path) {
         // do nothing
-        D.d("invokeing default Modify handler {}", path);
+        D.d("invoking default Modify handler {}", path);
     }
 
     public void onCreate(String path) {
         // do nothing
-        D.d("invokeing default Create handler {}", path);
+        D.d("invoking default Create handler {}", path);
     }
 
     public void onDelete (String path) {
         // do nothing
-        D.d("invokeing default Delete handler {}", path);
+        D.d("invoking default Delete handler {}", path);
     }
 
     public void onMove (String path) {
         // do nothing
-        D.d("invokeing default Move handler {}", path);
+        D.d("invoking default Move handler {}", path);
     }
 
     public void onClose(String path) {
         // do nothing
-        D.d("invokeing default Close handler {}", path);
+        D.d("invoking default Close handler {}", path);
     }
 
     public void run () {
 
         int numEvents = 0;
-        D.d("MAX events={}, epfd={},fd={}", maxEvents, epollDescriptor, inotifyDescriptor);
+        D.d("max_events={}, epfd={},fd={}", maxEvents, epollDescriptor, inotifyDescriptor);
         while ((numEvents = Clib.tryEpollWait(epollDescriptor, events[0].getPointer(), maxEvents, -1)) > 0) {
             D.d("Arrived Events={}", numEvents);
             for (int i = 0; i < numEvents; i++) {
@@ -79,7 +79,7 @@ public abstract class JinotifyListener extends Thread {
                     Clib.InotifyEvent eventBuf = new Clib.InotifyEvent();
                     int length = Clib.read(event.data.fd, eventBuf.getPointer(), eventBuf.size());
                     eventBuf.read();
-                    D.d("length={}, mask={}, create={}", length, Integer.toHexString(eventBuf.mask), Integer.toHexString(Clib.InotifyConstants.CREATE.value()));
+                    D.d("readByteLength={}, len={}, mask={}, create={}", length, eventBuf.len, Integer.toHexString(eventBuf.mask), Integer.toHexString(Clib.InotifyConstants.CREATE.value()));
                     D.d("mask={}", Integer.toBinaryString(eventBuf.mask));
                     if (length == -1) {
                         Clib.perror("error occurred while reading fd=" + event.data.fd);

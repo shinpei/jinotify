@@ -5,19 +5,22 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class Jinotify {
+
     private int inotifyDescriptor;
     private int watchingFileDescriptor;
     private int epollDescriptor;
 
-    final int MAX_EVENTS = 1;
+    final int MAX_EVENTS = 8;
     private static D D;
 
     public Jinotify () {
+
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "warn");
         D = new D(LoggerFactory.getLogger(this.getClass()));
     }
 
     public Jinotify (final boolean isVerboseMode, final boolean isDebugMode){
+
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "warn");
         if (isVerboseMode) {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
@@ -29,6 +32,7 @@ public class Jinotify {
     }
 
     private enum JinotifyEvents {
+
         ACCESS(Clib.InotifyConstants.ACCESS),
         MODIFY(Clib.InotifyConstants.MODIFY),
         CREATE(Clib.InotifyConstants.CREATE),
@@ -57,9 +61,11 @@ public class Jinotify {
     public static final JinotifyEvents CLOSE = JinotifyEvents.CLOSE;
 
     private List<Boolean> detectOverrideMethod(JinotifyListener listener) throws JinotifyException {
+
         // detect handler
         final Class klass = listener.getClass();
         try {
+
             List<Boolean> overrideList = Lists.newArrayList(
                     !klass.getMethod("onAccess", String.class).getDeclaringClass().equals(JinotifyListener.class),
                     !klass.getMethod("onModify", String.class).getDeclaringClass().equals(JinotifyListener.class),
@@ -70,6 +76,7 @@ public class Jinotify {
                     );
             return overrideList;
         } catch (NoSuchMethodException e) {
+
             throw new JinotifyException("SEVERE: Couldn't detect overrides methods, something wrong with your listener", e);
         }
 

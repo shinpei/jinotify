@@ -19,6 +19,8 @@ public class LogWatch {
                 acceptsAll(asList("v", "verbose"), "show info log");
                 acceptsAll(asList("f", "file")).withRequiredArg().ofType(String.class)
                         .describedAs("specify file or dir you want to watch");
+                acceptsAll(asList("e", "event")).withRequiredArg().ofType(String.class)
+                        .describedAs("specify detecting event, pick from CREATE, ACCESS, MODIFY, DELETE");
                 acceptsAll(asList("d", "debug"), "show debug log");
             }
         };
@@ -27,6 +29,8 @@ public class LogWatch {
         boolean isVerboseMode = false;
         boolean isDebugMode = false;
         String targetPath = "";
+        String detectingEvent = "";
+
         try {
             if (options.has("help")) {
                 optionParser.printHelpOn(System.out);
@@ -41,6 +45,11 @@ public class LogWatch {
                 targetPath = (String)options.valueOf("file");
             } else {
                 targetPath = "/tmp";
+            }
+            if (options.has("event")) {
+                detectingEvent = (String)options.valueOf("event");
+            } else {
+                detectingEvent = "";
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,9 +67,20 @@ public class LogWatch {
             public void onAccess(String path) {
                 System.out.println("Access: " + path);
             }
+
+            @Override
+            public void onModify(String path){
+                System.out.println("Modified: " + path);
+            }
+
+            @Override
+            public void onMove(String path) {
+                System.out.println("Moved: "  + path);
+            }
         }
 
         MyListener listener = new MyListener();
+
         if (targetPath.isEmpty()) {
             System.err.println("file path is empty, please specify it with -f option, see help (with -h, -help)");
         }
@@ -73,6 +93,5 @@ public class LogWatch {
         while(true) {
 
         }
-//        jinotify.closeNotifier();
     }
 }
