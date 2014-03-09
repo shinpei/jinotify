@@ -52,23 +52,13 @@ public abstract class JinotifyListener extends Thread {
         D.d("invoking default Close handler {}", path);
     }
 
-    final private Clib.InotifyEvent[] readInotifyEvent() {
-
-        return null;
-    }
-
+    private volatile boolean isFinished = false;
 
     public void run () {
 
         int numEvents = 0;
         D.d("max_events={}, epfd={},fd={}", maxEvents, epollDescriptor, inotifyDescriptor);
         while ((numEvents = Clib.tryEpollWait(epollDescriptor, events[0].getPointer(), 1, -1)) > 0) {
-            try {
-                Thread.currentThread().sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
             events[0].read();
             Clib.EpollEvent event = events[0];
             if (
@@ -82,19 +72,22 @@ public abstract class JinotifyListener extends Thread {
                 Clib.close(event.data.fd);
                 // TODO: we need to stop this thread
                 Clib.perror("Seems watching descriptor closed");
-                continue;
+                D.e("Error, or interruption occured while reading fd. thread is going to suspend");
+                Thread.currentThread().suspend();
             }
             else if (inotifyDescriptor == event.data.fd) {
                 // Must be ready for read inotify
                 Clib.InotifyEvent eventBuf = new Clib.InotifyEvent();
                 D.d("Arrived Events={}, size={}", numEvents, eventBuf.size());
-
                 int length = Clib.read(event.data.fd, eventBuf.getPointer(), eventBuf.size());
                 eventBuf.read();
                 D.d("readByteLength={}, len={}, mask={}, create={}", length, eventBuf.len, Integer.toHexString(eventBuf.mask), Integer.toHexString(Clib.InotifyConstants.CREATE.value()));
                 D.d("mask={}", Integer.toBinaryString(eventBuf.mask));
                 if (length == -1) {
+                    D.e("Error occured while reading fd, seems detecting path is too big, thread is going to suspend");
                     Clib.perror("error occurred while reading fd=" + event.data.fd);
+                    // TODO: we need to stop this tread
+                    Thread.currentThread().suspend();
                 }
                 else {
                     String path = new String(eventBuf.name);
