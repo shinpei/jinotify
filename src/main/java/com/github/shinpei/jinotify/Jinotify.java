@@ -51,11 +51,11 @@ public class Jinotify {
         try {
             List<Boolean> overrideList = Lists.newArrayList(
                     !klass.getMethod("onAccess", String.class).getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onModify").getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onCreate").getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onDelete").getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onMove").getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onClose").getDeclaringClass().equals(JinotifyListener.class)
+                    !klass.getMethod("onModify", String.class).getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onCreate", String.class).getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onDelete", String.class).getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onMove", String.class).getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onClose", String.class).getDeclaringClass().equals(JinotifyListener.class)
                     );
             return overrideList;
         } catch (NoSuchMethodException e) {

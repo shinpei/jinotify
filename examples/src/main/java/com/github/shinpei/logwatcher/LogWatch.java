@@ -18,12 +18,14 @@ public class LogWatch {
                 System.out.println("Access: " + path);
             }
         }
+
         MyListener listener = new MyListener();
         try {
             jinotify.addWatch("/tmp", listener);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+
         while(true) {
 
         }

@@ -47,8 +47,9 @@ public abstract class JinotifyListener extends Thread {
         D.d("invokeing default Move handler {}", path);
     }
 
-    public void onClose() {
+    public void onClose(String path) {
         // do nothing
+        D.d("invokeing default Close handler {}", path);
     }
 
     public void run () {
@@ -102,7 +103,7 @@ public abstract class JinotifyListener extends Thread {
                             this.onMove(path);
                         }
                         else if ((eventBuf.mask & Clib.InotifyConstants.CLOSE.value()) != 0) {
-                            this.onClose();
+                            this.onClose(path);
                         }
                     }
                 }
