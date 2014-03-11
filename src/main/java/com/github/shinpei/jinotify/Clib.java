@@ -82,7 +82,7 @@ public class Clib {
     public static int tryInotifyAddWatch(int fd, String path, int mask) {
         int wd = inotify_add_watch(fd, path,  mask);
         D.d("Add watch for {}, mask={}, and wd={}", path, mask, wd);
-        Preconditions.checkState(wd >= 0, "Couldn't add inotify watch for path=" + path);
+        Preconditions.checkState(wd >= 0, strerror(Native.getLastError()) + ", Couldn't add inotify watch for path=" + path );
         return wd;
     }
 
@@ -177,6 +177,6 @@ public class Clib {
     public static native int close(int fd);
     public static native int read (int fd, Pointer buf, int size);
     public static native void perror(String msg);
-
+    public static native String strerror(int errno);
 }
 
