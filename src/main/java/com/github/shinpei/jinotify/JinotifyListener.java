@@ -52,6 +52,45 @@ public abstract class JinotifyListener extends Thread {
         D.d("invoking default Close handler {}", path);
     }
 
+    public void onEventArrived(int mask) {
+        if ((mask & Clib.InotifyConstants.CREATE.value()) != 0) {
+            D.d("IN_CREATE");
+        }
+        if ((mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
+            D.d("IN_ACCESS");
+        }
+        if ((mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
+            D.d("IN_MODIFY");
+        }
+        if ((mask & Clib.InotifyConstants.CLOSE.value()) != 0) {
+            D.d("IN_CLOSE");
+        }
+        if ((mask & Clib.InotifyConstants.ATTRIB.value()) != 0) {
+            D.d("IN_ATTRIB");
+        }
+        if ((mask & Clib.InotifyConstants.CLOSE_NOWRITE.value()) != 0) {
+            D.d("IN_CLOSE_NOWRITE");
+        }
+        if ((mask & Clib.InotifyConstants.CLOSE_WRITE.value()) != 0) {
+            D.d("IN_CLOSE_WRITE");
+        }
+        if ((mask & Clib.InotifyConstants.DELETE.value()) != 0) {
+            D.d("IN_DELETE");
+        }
+        if ((mask & Clib.InotifyConstants.DELETE_SELF.value()) != 0) {
+            D.d("IN_DELETE_SELF");
+        }
+        if ((mask & Clib.InotifyConstants.MOVE.value()) != 0) {
+            D.d("IN_MOVE");
+        }
+        if ((mask & Clib.InotifyConstants.MOVE_SELF.value()) != 0) {
+            D.d("IN_MOVE_SELF");
+        }
+        if ((mask & Clib.InotifyConstants.OPEN.value()) != 0) {
+            D.d("IN_OPEN");
+        }
+    }
+
     private volatile boolean isFinished = false;
 
     public void run () {
@@ -91,8 +130,8 @@ public abstract class JinotifyListener extends Thread {
                 }
                 else {
                     String path = new String(eventBuf.name);
+                    this.onEventArrived(eventBuf.mask);
                     if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
-                        //this.onAccess(new String(eventBuf.name));
                         this.onAccess(path);
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
