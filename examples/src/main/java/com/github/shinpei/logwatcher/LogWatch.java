@@ -1,11 +1,13 @@
 package com.github.shinpei.logwatcher;
 
 import com.github.shinpei.jinotify.Jinotify;
+import com.github.shinpei.jinotify.JinotifyEvent;
 import com.github.shinpei.jinotify.JinotifyListener;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
 import java.io.IOException;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -76,6 +78,11 @@ public class LogWatch {
             @Override
             public void onMove(String path) {
                 System.out.println("Moved: "  + path);
+            }
+
+            @Override
+            public void onEventArrived(List<JinotifyEvent> events) {
+
             }
         }
 

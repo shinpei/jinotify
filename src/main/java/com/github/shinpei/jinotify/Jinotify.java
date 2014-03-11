@@ -31,35 +31,6 @@ public class Jinotify {
         D = new D(LoggerFactory.getLogger(this.getClass()));
     }
 
-    private enum JinotifyEvents {
-
-        ACCESS(Clib.InotifyConstants.ACCESS),
-        MODIFY(Clib.InotifyConstants.MODIFY),
-        CREATE(Clib.InotifyConstants.CREATE),
-        DELETE(Clib.InotifyConstants.DELETE),
-        MOVE(Clib.InotifyConstants.MOVE),
-        CLOSE(Clib.InotifyConstants.CLOSE);
-
-        private final Clib.InotifyConstants value;
-
-        JinotifyEvents(final Clib.InotifyConstants value) {
-
-            this.value = value;
-        }
-
-        public final int value() {
-
-            return value.value();
-        }
-    }
-
-    public static final JinotifyEvents ACCESS = JinotifyEvents.ACCESS;
-    public static final JinotifyEvents MODIFY = JinotifyEvents.MODIFY;
-    public static final JinotifyEvents CREATE = JinotifyEvents.CREATE;
-    public static final JinotifyEvents DELETE = JinotifyEvents.DELETE;
-    public static final JinotifyEvents MOVE = JinotifyEvents.MOVE;
-    public static final JinotifyEvents CLOSE = JinotifyEvents.CLOSE;
-
     private List<Boolean> detectOverrideMethod(JinotifyListener listener) throws JinotifyException {
 
         // detect handler
@@ -83,7 +54,12 @@ public class Jinotify {
     }
 
     private final int calculateMask(List<Boolean> overrideList) {
-        final JinotifyEvents[] eventListForMaskCalculation = {ACCESS, MODIFY, CREATE, DELETE, MOVE, CLOSE};
+        final JinotifyEvent[] eventListForMaskCalculation = {
+                JinotifyEvent.ACCESS, JinotifyEvent.MODIFY,
+                JinotifyEvent.CREATE, JinotifyEvent.DELETE,
+                JinotifyEvent.MOVE, JinotifyEvent.CLOSE
+        };
+
         int mask = 0;
         int idx = 0;
         for (boolean b: overrideList){
@@ -115,7 +91,7 @@ public class Jinotify {
         listener.start();
     }
 
-    public void disableEvent(JinotifyEvents disablingEvent) throws JinotifyException {
+    public void disableEvent(JinotifyEvent disablingEvent) throws JinotifyException {
         if (watchingFileDescriptor == 0) {
             throw new JinotifyException("inotify already watching some resource, please call this method before addWatch");
         }

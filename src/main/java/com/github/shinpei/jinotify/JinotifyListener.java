@@ -1,6 +1,11 @@
 package com.github.shinpei.jinotify;
 
+import com.sun.xml.internal.xsom.impl.scd.Iterators;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 public abstract class JinotifyListener extends Thread {
 
@@ -47,12 +52,20 @@ public abstract class JinotifyListener extends Thread {
     }
 
     // please override this one
-    public void onEventArrived(int mask) {
+
+    public void onEventArrived(List<JinotifyEvent> events) {
+        D.d(events.toString());
+    }
+
+    public List<JinotifyEvent> transferMaskToEvents(int mask) {
+
+        List<JinotifyEvent> events = new ArrayList<JinotifyEvent>(EnumSet.allOf(Clib.InotifyConstants.class).size());
+
         if ((mask & Clib.InotifyConstants.CREATE.value()) != 0) {
-            D.d("IN_CREATE");
+            events.add(JinotifyEvent.CREATE);
         }
         if ((mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
-            D.d("IN_ACCESS");
+            events.add(JinotifyEvent.ACCESS);
         }
         if ((mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
             D.d("IN_MODIFY");
@@ -84,6 +97,7 @@ public abstract class JinotifyListener extends Thread {
         if ((mask & Clib.InotifyConstants.OPEN.value()) != 0) {
             D.d("IN_OPEN");
         }
+        return events;
     }
 
     // TODO: for detecting thread sleep. not yet implemented
@@ -125,9 +139,10 @@ public abstract class JinotifyListener extends Thread {
                 }
                 else {
                     String path = new String(eventBuf.name);
-                    this.onEventArrived(eventBuf.mask);
+                    List<JinotifyEvent> detectedEvents = transferMaskToEvents(eventBuf.mask);
+                    this.onEventArrived(detectedEvents);
                     // we suppose event stacks in event que, and no need to handle them at once.
-                    if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
+                    if (detectedEvents.contains(JinotifyEvent.ACCESS)) {
                         this.onAccess(path);
                     }
                     else if ((eventBuf.mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
