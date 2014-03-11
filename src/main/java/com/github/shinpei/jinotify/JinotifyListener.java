@@ -1,6 +1,5 @@
 package com.github.shinpei.jinotify;
 
-import com.sun.xml.internal.xsom.impl.scd.Iterators;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -61,6 +60,7 @@ public abstract class JinotifyListener extends Thread {
 
         List<JinotifyEvent> events = new ArrayList<JinotifyEvent>(EnumSet.allOf(Clib.InotifyConstants.class).size());
 
+        // FIXME: leave this as todo
         if ((mask & Clib.InotifyConstants.CREATE.value()) != 0) {
             events.add(JinotifyEvent.CREATE);
         }
@@ -68,34 +68,37 @@ public abstract class JinotifyListener extends Thread {
             events.add(JinotifyEvent.ACCESS);
         }
         if ((mask & Clib.InotifyConstants.MODIFY.value()) != 0) {
-            D.d("IN_MODIFY");
+            events.add(JinotifyEvent.MODIFY);
         }
         if ((mask & Clib.InotifyConstants.CLOSE.value()) != 0) {
-            D.d("IN_CLOSE");
+            events.add(JinotifyEvent.CLOSE);
         }
         if ((mask & Clib.InotifyConstants.ATTRIB.value()) != 0) {
-            D.d("IN_ATTRIB");
+            events.add(JinotifyEvent.ATTRIB);
         }
         if ((mask & Clib.InotifyConstants.CLOSE_NOWRITE.value()) != 0) {
-            D.d("IN_CLOSE_NOWRITE");
+            events.add(JinotifyEvent.CLOSE_NOWRITE);
         }
         if ((mask & Clib.InotifyConstants.CLOSE_WRITE.value()) != 0) {
-            D.d("IN_CLOSE_WRITE");
+            events.add(JinotifyEvent.CLOSE_WRITE);
         }
         if ((mask & Clib.InotifyConstants.DELETE.value()) != 0) {
-            D.d("IN_DELETE");
+            events.add(JinotifyEvent.DELETE);
         }
         if ((mask & Clib.InotifyConstants.DELETE_SELF.value()) != 0) {
-            D.d("IN_DELETE_SELF");
+            events.add(JinotifyEvent.DELETE_SELF);
         }
         if ((mask & Clib.InotifyConstants.MOVE.value()) != 0) {
-            D.d("IN_MOVE");
+            events.add(JinotifyEvent.MOVE);
         }
         if ((mask & Clib.InotifyConstants.MOVE_SELF.value()) != 0) {
-            D.d("IN_MOVE_SELF");
+            events.add(JinotifyEvent.MOVE_SELF);
+        }
+        if ((mask & JinotifyEvent.MOVED_FROM.value()) != 0) {
+            events.add(JinotifyEvent.MOVED_FROM);
         }
         if ((mask & Clib.InotifyConstants.OPEN.value()) != 0) {
-            D.d("IN_OPEN");
+            events.add(JinotifyEvent.OPEN);
         }
         return events;
     }

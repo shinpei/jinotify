@@ -2,7 +2,6 @@ package com.github.shinpei.jinotify;
 
 import com.google.common.base.Preconditions;
 import com.sun.jna.*;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
