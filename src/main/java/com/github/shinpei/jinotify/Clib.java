@@ -44,7 +44,7 @@ public class Clib {
         public int mask;
         public int cookie;
         public int len;
-        public byte[] name = new byte[PATH_MAX]; // __flexarr, but we limit it to 16
+        public byte[] name = new byte[PATH_MAX]; // __flexarr, but we limit it to PATH_MAX
 
         protected List getFieldOrder () {
             return Arrays.asList("wd", "mask", "cookie", "len", "name");
@@ -72,9 +72,13 @@ public class Clib {
     private static native int inotify_add_watch(int fd, String path, int mask);
     private static native int inotify_rm_watch(int fd, int wd);
 
+    private static final String tryStrerror() {
+        return strerror(Native.getLastError());
+    }
+
     public static int tryInotifyInit () {
         int fd = inotify_init();
-        Preconditions.checkState(fd >= 0, "Couldn't initiate inotify");
+        Preconditions.checkState(fd >= 0, tryStrerror() + ", Couldn't initiate inotify");
         return fd;
     }
 
@@ -82,13 +86,13 @@ public class Clib {
     public static int tryInotifyAddWatch(int fd, String path, int mask) {
         int wd = inotify_add_watch(fd, path,  mask);
         D.d("Add watch for {}, mask={}, and wd={}", path, mask, wd);
-        Preconditions.checkState(wd >= 0, strerror(Native.getLastError()) + ", Couldn't add inotify watch for path=" + path );
+        Preconditions.checkState(wd >= 0, tryStrerror() + ", Couldn't add inotify watch for path=" + path );
         return wd;
     }
 
     public static void tryInotifyRmWatch(int fd, int wd) {
         int retVal = inotify_rm_watch(fd, wd);
-        Preconditions.checkState(retVal == 0, "Couldn't remove inotify watch for fd=%s, wd=%s", fd, wd);
+        Preconditions.checkState(retVal == 0, tryStrerror() + ", Couldn't remove inotify watch for fd=%s, wd=%s", fd, wd);
         // when success, it returns 0.
     }
 

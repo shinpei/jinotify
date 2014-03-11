@@ -15,13 +15,6 @@ public abstract class JinotifyListener extends Thread {
         // do nothing.
     }
 
-    static private enum OverrideList {
-        ACCESS(0), MODIFY(1), CREATE(2), DELETE(3), MOVE(4),
-        CLOSE(5);
-        public int value;
-        OverrideList(int i) { this.value = i; }
-    }
-
     public void onAccess (String path) {
         // do nothing
         D.d("invoking default Access handler {}", path);
@@ -93,6 +86,7 @@ public abstract class JinotifyListener extends Thread {
         }
     }
 
+    // TODO: for detecting thread sleep. not yet implemented
     private volatile boolean isFinished = false;
 
     public void run () {
@@ -111,7 +105,6 @@ public abstract class JinotifyListener extends Thread {
                 // one of the watching inotify decriptor dies
 
                 Clib.close(event.data.fd);
-                // TODO: we need to stop this thread
                 Clib.perror("Seems watching descriptor closed");
                 D.e("Error, or interruption occured while reading fd. thread is going to suspend");
                 Thread.currentThread().suspend();
@@ -124,15 +117,16 @@ public abstract class JinotifyListener extends Thread {
                 eventBuf.read();
                 D.d("readByteLength={}, len={}, mask={}, create={}", length, eventBuf.len, Integer.toHexString(eventBuf.mask), Integer.toHexString(Clib.InotifyConstants.CREATE.value()));
                 D.d("mask={}", Integer.toBinaryString(eventBuf.mask));
+
                 if (length == -1) {
                     D.e("Error occured while reading fd, seems detecting path is too big, thread is going to suspend");
                     Clib.perror("error occurred while reading fd=" + event.data.fd);
-                    // TODO: we need to stop this tread
                     Thread.currentThread().suspend();
                 }
                 else {
                     String path = new String(eventBuf.name);
                     this.onEventArrived(eventBuf.mask);
+                    // we suppose event stacks in event que, and no need to handle them at once.
                     if ((eventBuf.mask & Clib.InotifyConstants.ACCESS.value()) != 0) {
                         this.onAccess(path);
                     }
