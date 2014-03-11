@@ -43,14 +43,14 @@ public class Jinotify {
         private final Clib.InotifyConstants value;
 
         JinotifyEvents(final Clib.InotifyConstants value) {
-            this.value = value;
 
+            this.value = value;
         }
 
         public final int value() {
+
             return value.value();
         }
-
     }
 
     public static final JinotifyEvents ACCESS = JinotifyEvents.ACCESS;
@@ -83,25 +83,13 @@ public class Jinotify {
     }
 
     private final int calculateMask(List<Boolean> overrideList) {
+        final JinotifyEvents[] eventListForMaskCalculation = {ACCESS, MODIFY, CREATE, DELETE, MOVE, CLOSE};
         int mask = 0;
-        if (overrideList.get(0) == true) {
-            // access
-            mask |= ACCESS.value();
-        }
-        if (overrideList.get(1) == true) {
-            mask |= MODIFY.value();
-        }
-        if (overrideList.get(2) == true) {
-            mask |= CREATE.value();
-        }
-        if (overrideList.get(3) == true) {
-            mask |= DELETE.value();
-        }
-        if (overrideList.get(4) == true) {
-            mask |= MOVE.value();
-        }
-        if (overrideList.get(5) == true) {
-            mask |= CLOSE.value();
+        int idx = 0;
+        for (boolean b: overrideList){
+            if (b == true) {
+                mask |= eventListForMaskCalculation[idx++].value();
+            }
         }
         return mask;
     }
@@ -127,7 +115,7 @@ public class Jinotify {
         listener.start();
     }
 
-    public void disableEvent(JinotifyEvents disablingEvent) throws JinotifyException{
+    public void disableEvent(JinotifyEvents disablingEvent) throws JinotifyException {
         if (watchingFileDescriptor == 0) {
             throw new JinotifyException("inotify already watching some resource, please call this method before addWatch");
         }

@@ -47,11 +47,13 @@ public abstract class JinotifyListener extends Thread {
         D.d("invoking default Move handler {}", path);
     }
 
+
     public void onClose(String path) {
         // do nothing
         D.d("invoking default Close handler {}", path);
     }
 
+    // please override this one
     public void onEventArrived(int mask) {
         if ((mask & Clib.InotifyConstants.CREATE.value()) != 0) {
             D.d("IN_CREATE");
