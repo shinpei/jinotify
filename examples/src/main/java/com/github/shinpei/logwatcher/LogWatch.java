@@ -82,7 +82,7 @@ public class LogWatch {
 
             @Override
             public void onEventArrived(List<JinotifyEvent> events) {
-
+                super.onEventArrived(events);
             }
         }
 
