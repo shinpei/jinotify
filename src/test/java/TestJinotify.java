@@ -16,7 +16,7 @@ public class TestJinotify {
         class MyListenerCreate extends  JinotifyListener {
             @Override
             public void onCreate (String path) {
-                System.out.println("hey, you created " + path + " , hun?");
+                System.out.println("hey, you created " + path + " , huh?");
             }
         }
 
@@ -44,16 +44,16 @@ public class TestJinotify {
     }
 
     @Test
-    public void onCreate () throws Exception {
+    public void onClose () throws Exception {
 
-        class MyListenerCreate extends JinotifyListener {
+        class MyListenerClose extends JinotifyListener {
             @Override
-            public void onModify(String path) {
-                System.out.println("hey, you modified " + path + ", huh?");
+            public void onClose(String path) {
+                System.out.println("hey, you close " + path + ", huh?");
             }
         }
         Jinotify jinotify = new Jinotify();
-        MyListenerCreate listener = new MyListenerCreate();
+        MyListenerClose listener = new MyListenerClose();
         jinotify.addWatch(PATH, listener);
 
         jinotify.closeNotifier();
