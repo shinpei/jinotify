@@ -2,12 +2,12 @@ package com.github.shinpei.jinotify;
 
 public enum JinotifyEvent {
 
-    ACCESS(Clib.InotifyConstants.ACCESS),
-    MODIFY(Clib.InotifyConstants.MODIFY),
-    CREATE(Clib.InotifyConstants.CREATE),
-    DELETE(Clib.InotifyConstants.DELETE),
-    MOVE(Clib.InotifyConstants.MOVE),
-    CLOSE(Clib.InotifyConstants.CLOSE),
+    ACCESS(Clib.InotifyConstants.ACCESS, "ACCESS"),
+    MODIFY(Clib.InotifyConstants.MODIFY, "MODIFY"),
+    CREATE(Clib.InotifyConstants.CREATE, "CREATE"),
+    DELETE(Clib.InotifyConstants.DELETE, "DELETE"),
+    MOVE(Clib.InotifyConstants.MOVE, "MOVE"),
+    CLOSE(Clib.InotifyConstants.CLOSE, "CLOSE"),
     /* Not used as jinotify event */
     ATTRIB(Clib.InotifyConstants.ATTRIB),
     CLOSE_NOWRITE(Clib.InotifyConstants.CLOSE_NOWRITE),
@@ -21,14 +21,27 @@ public enum JinotifyEvent {
 
 
     private final Clib.InotifyConstants value;
+    private final String symbolRepresentation;
+
+    JinotifyEvent(final Clib.InotifyConstants value, final String symbol) {
+        this.value = value;
+        this.symbolRepresentation = symbol;
+    }
 
     JinotifyEvent(final Clib.InotifyConstants value) {
-
         this.value = value;
+        this.symbolRepresentation = "";
     }
 
     public final int value() {
 
         return value.value();
     }
+
+    @Override
+    public String toString() {
+
+        return symbolRepresentation;
+    }
+
 }

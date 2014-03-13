@@ -55,7 +55,8 @@ public class Jinotify {
         inotifyDescriptor = Clib.tryInotifyInit();
 
         List<Boolean> overrideList = listener.detectOverrideMethod();
-        final int mask = calculateMask(overrideList);
+//        final int mask = calculateMask(overrideList);
+        final int mask = listener.getEventMask();
 
         watchingFileDescriptor = Clib.tryInotifyAddWatch(inotifyDescriptor, absolutePath, mask);
         epollDescriptor = Clib.tryEpollCreate();
