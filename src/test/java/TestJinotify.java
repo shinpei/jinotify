@@ -36,9 +36,24 @@ public class TestJinotify {
                 System.out.println("hey, you modified " + path + ", huh?");
             }
         }
-
         Jinotify jinotify = new Jinotify();
         MyListenerModify listener = new MyListenerModify();
+        jinotify.addWatch(PATH, listener);
+
+        jinotify.closeNotifier();
+    }
+
+    @Test
+    public void onCreate () throws Exception {
+
+        class MyListenerCreate extends JinotifyListener {
+            @Override
+            public void onModify(String path) {
+                System.out.println("hey, you modified " + path + ", huh?");
+            }
+        }
+        Jinotify jinotify = new Jinotify();
+        MyListenerCreate listener = new MyListenerCreate();
         jinotify.addWatch(PATH, listener);
 
         jinotify.closeNotifier();

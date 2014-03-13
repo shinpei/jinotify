@@ -72,7 +72,7 @@ public class LogWatch {
 
             @Override
             public void onModify(String path){
-                System.out.println("Modified: " + path);
+
             }
 
             @Override
@@ -93,7 +93,8 @@ public class LogWatch {
         }
         try {
             jinotify.addWatch(targetPath, listener);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
