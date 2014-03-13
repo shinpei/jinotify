@@ -1,5 +1,6 @@
 package com.github.shinpei.jinotify;
 
+import com.google.common.collect.Lists;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -54,6 +55,34 @@ public abstract class JinotifyListener extends Thread {
 
     public void onEventArrived(List<JinotifyEvent> events) {
         D.d(events.toString());
+    }
+
+    private List<JinotifyEvent> handlingEvents;
+
+    public List<JinotifyEvent> getHandlingEvents () {
+        return handlingEvents;
+    }
+
+    public List<Boolean> detectOverrideMethod() throws JinotifyException {
+
+        // detect handler
+        final Class klass = this.getClass();
+        try {
+
+            List<Boolean> overrideList = Lists.newArrayList(
+                    !klass.getMethod("onAccess", String.class).getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onModify", String.class).getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onCreate", String.class).getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onDelete", String.class).getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onMove", String.class).getDeclaringClass().equals(JinotifyListener.class),
+                    !klass.getMethod("onClose", String.class).getDeclaringClass().equals(JinotifyListener.class)
+            );
+            return overrideList;
+        } catch (NoSuchMethodException e) {
+
+            throw new JinotifyException("SEVERE: Couldn't detect overrides methods, something wrong with your listener", e);
+        }
+
     }
 
     public List<JinotifyEvent> transferMaskToEvents(int mask) {

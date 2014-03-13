@@ -31,27 +31,6 @@ public class Jinotify {
         D = new D(LoggerFactory.getLogger(this.getClass()));
     }
 
-    private List<Boolean> detectOverrideMethod(JinotifyListener listener) throws JinotifyException {
-
-        // detect handler
-        final Class klass = listener.getClass();
-        try {
-
-            List<Boolean> overrideList = Lists.newArrayList(
-                    !klass.getMethod("onAccess", String.class).getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onModify", String.class).getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onCreate", String.class).getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onDelete", String.class).getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onMove", String.class).getDeclaringClass().equals(JinotifyListener.class),
-                    !klass.getMethod("onClose", String.class).getDeclaringClass().equals(JinotifyListener.class)
-                    );
-            return overrideList;
-        } catch (NoSuchMethodException e) {
-
-            throw new JinotifyException("SEVERE: Couldn't detect overrides methods, something wrong with your listener", e);
-        }
-
-    }
 
     private final int calculateMask(List<Boolean> overrideList) {
         final JinotifyEvent[] eventListForMaskCalculation = {
@@ -75,7 +54,7 @@ public class Jinotify {
 
         inotifyDescriptor = Clib.tryInotifyInit();
 
-        List<Boolean> overrideList = detectOverrideMethod(listener);
+        List<Boolean> overrideList = listener.detectOverrideMethod();
         final int mask = calculateMask(overrideList);
 
         watchingFileDescriptor = Clib.tryInotifyAddWatch(inotifyDescriptor, absolutePath, mask);
