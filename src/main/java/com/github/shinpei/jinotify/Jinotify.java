@@ -1,6 +1,5 @@
 package com.github.shinpei.jinotify;
 
-import com.google.common.collect.Lists;
 import org.slf4j.LoggerFactory;
 import java.util.List;
 
@@ -16,11 +15,10 @@ public class Jinotify {
     public Jinotify () {
 
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "warn");
-        D = new D(LoggerFactory.getLogger(this.getClass()));
+        commonInitiation();
     }
 
     public Jinotify (final boolean isVerboseMode, final boolean isDebugMode){
-
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "warn");
         if (isVerboseMode) {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
@@ -28,6 +26,14 @@ public class Jinotify {
         if (isDebugMode) {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         }
+        commonInitiation();
+    }
+
+    private Jinotify(String logLevel) {
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", logLevel);
+    }
+
+    private void commonInitiation () {
         D = new D(LoggerFactory.getLogger(this.getClass()));
     }
 
@@ -54,7 +60,7 @@ public class Jinotify {
 
         inotifyDescriptor = Clib.tryInotifyInit();
 
-        List<Boolean> overrideList = listener.detectOverrideMethod();
+        listener.detectOverrideMethod();
 //        final int mask = calculateMask(overrideList);
         final int mask = listener.getEventMask();
 

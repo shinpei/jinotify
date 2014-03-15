@@ -1,12 +1,9 @@
 package com.github.shinpei.jinotify;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
+
 public abstract class JinotifyListener extends Thread {
 
     protected int epollDescriptor;
@@ -63,25 +60,27 @@ public abstract class JinotifyListener extends Thread {
         return handlingEvents;
     }
 
-    public List<Boolean> detectOverrideMethod() throws JinotifyException {
+    public List<JinotifyEvent> detectOverrideMethod() throws JinotifyException {
 
         final Class klass = this.getClass();
-        List<List<String, JinotifyEvent>> methodNames = Lists.newArrayList(
-                Lists.newArrayList("onAccess", JinotifyEvent.ACCESS),
-                ImmutableMap.of("onModify", JinotifyEvent.MODIFY),
-                ImmutableMap.of("onCreate", JinotifyEvent.CREATE),
-                ImmutableMap.of("onDelete", JinotifyEvent.DELETE),
-                ImmutableMap.of("onMove", JinotifyEvent.MOVE),
-                ImmutableMap.of("onClose", JinotifyEvent.CLOSE)
-        );
+        Map<String, JinotifyEvent> methodNames = new HashMap<String, JinotifyEvent>() {{
+            put("onAccess", JinotifyEvent.ACCESS);
+            put("onModify", JinotifyEvent.MODIFY);
+            put("onCreate", JinotifyEvent.CREATE);
+            put("onDelete", JinotifyEvent.DELETE);
+            put("onClose", JinotifyEvent.CLOSE);
+            put("onOpen", JinotifyEvent.OPEN);
+        }};
+
 
         try {
-            for (Map<String, JinotifyEvent> pair : methodNames) {
-                if (klass.getMethod(pair.get(0), String.class).getDeclaringClass().equals(JinotifyListener.class)) {
+            for (String key : methodNames.keySet()) {
 
+                if (klass.getMethod(key, String.class).getDeclaringClass().equals(JinotifyListener.class)) {
+                    handlingEvents.add(methodNames.get(key));
                 }
             }
-
+            /*
             List<Boolean> overrideList = Lists.newArrayList(
                     !klass.getMethod("onAccess", String.class).getDeclaringClass().equals(JinotifyListener.class),
                     !klass.getMethod("onModify", String.class).getDeclaringClass().equals(JinotifyListener.class),
@@ -90,7 +89,8 @@ public abstract class JinotifyListener extends Thread {
                     !klass.getMethod("onMove", String.class).getDeclaringClass().equals(JinotifyListener.class),
                     !klass.getMethod("onClose", String.class).getDeclaringClass().equals(JinotifyListener.class)
             );
-            return overrideList;
+            */
+            return handlingEvents;
         } catch (NoSuchMethodException e) {
 
             throw new JinotifyException("SEVERE: Couldn't detect overrides methods, something wrong with your listener", e);
