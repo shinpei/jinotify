@@ -103,6 +103,7 @@ public abstract class JinotifyListener extends Thread {
         if (handlingEvents == null) {
             handlingEvents = this.detectOverrideMethod();
         }
+        // TODO;
         return mask;
     }
 

@@ -29,10 +29,6 @@ public class Jinotify {
         commonInitiation();
     }
 
-    private Jinotify(String logLevel) {
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", logLevel);
-    }
-
     private void commonInitiation () {
         D = new D(LoggerFactory.getLogger(this.getClass()));
     }
@@ -60,8 +56,6 @@ public class Jinotify {
 
         inotifyDescriptor = Clib.tryInotifyInit();
 
-        listener.detectOverrideMethod();
-//        final int mask = calculateMask(overrideList);
         final int mask = listener.getEventMask();
 
         watchingFileDescriptor = Clib.tryInotifyAddWatch(inotifyDescriptor, absolutePath, mask);
